@@ -2,6 +2,8 @@ import SwiftUI
 
 struct DreamComposerView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var featureGate: FeatureGate
+    @EnvironmentObject private var paywallPresenter: PaywallPresenter
     @ObservedObject var viewModel: DreamInterpreterViewModel
     let startInVoiceMode: Bool
     let onSaved: () -> Void
@@ -67,6 +69,12 @@ struct DreamComposerView: View {
             guard startInVoiceMode, !hasAutoStartedVoice else { return }
             hasAutoStartedVoice = true
             _ = await viewModel.toggleComposerRecording()
+        }
+        .sheet(isPresented: $paywallPresenter.isShowing) {
+            NavigationStack {
+                PaywallView()
+            }
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -414,15 +422,25 @@ struct DreamComposerView: View {
         guard !detail.isEmpty else { return }
 
         let source: DreamInputSource = usedVoiceInput ? .voice : .typed
+        let pendingRecordID = UUID()
+        var shouldGenerateImage = featureGate.canUseImage(forDreamID: pendingRecordID.uuidString)
+        if shouldGenerateImage {
+            shouldGenerateImage = featureGate.consumeImage(forDreamID: pendingRecordID.uuidString)
+        }
+        if !shouldGenerateImage {
+            paywallPresenter.present(for: .image)
+        }
 
         Task {
             await viewModel.interpretDreamFromComposer(
+                recordID: pendingRecordID,
                 title: "",
                 detailText: detail,
                 symbols: [],
                 clarity: (claritySun + clarityMoon) / 2,
                 mood: selectedMoodValue,
-                source: source
+                source: source,
+                shouldGenerateImage: shouldGenerateImage
             )
 
             if viewModel.errorMessage == nil {

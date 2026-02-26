@@ -2,11 +2,14 @@ import SwiftUI
 import UIKit
 
 struct DreamInterpretationView: View {
+    @EnvironmentObject private var featureGate: FeatureGate
+    @EnvironmentObject private var paywallPresenter: PaywallPresenter
     @ObservedObject var viewModel: DreamInterpreterViewModel
     let showsBackButton: Bool
     let onBack: (() -> Void)?
 
     @State private var showFullAnalysis = false
+    @State private var showLockedInterpretationPreview = false
     @State private var showQuestionInput = false
     @State private var questionText = ""
     @FocusState private var isQuestionFocused: Bool
@@ -33,10 +36,17 @@ struct DreamInterpretationView: View {
                         previewCard(record: record)
                         keywordsCard(record: record)
                         dreamJournalCard(record: record)
-                        expandButton
+                        expandButton(record: record)
                         if showFullAnalysis {
-                            fullInterpretationCard(record: record)
-                            followUpBlock(record: record)
+                            if showLockedInterpretationPreview {
+                                LockedPreviewView(
+                                    text: record.interpretation,
+                                    source: .interpretation
+                                )
+                            } else {
+                                fullInterpretationCard(record: record)
+                                followUpBlock(record: record)
+                            }
                         }
                         messages
                     } else {
@@ -51,6 +61,12 @@ struct DreamInterpretationView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onChange(of: viewModel.selectedRecordID) { _, _ in
             resetExpansionState()
+        }
+        .sheet(isPresented: $paywallPresenter.isShowing) {
+            NavigationStack {
+                PaywallView()
+            }
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -200,6 +216,19 @@ struct DreamInterpretationView: View {
                     ]
                     : record.symbols
             )
+
+            Button {
+                openPremiumPerspective(for: record)
+            } label: {
+                Text(String(localized: "interpretation.perspective.button"))
+                    .font(DreamTheme.medium(13))
+                    .foregroundStyle(DreamTheme.goldStart)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
         }
         .dreamCard(light: false, cornerRadius: 20)
     }
@@ -243,11 +272,9 @@ struct DreamInterpretationView: View {
         .dreamCard(light: false, cornerRadius: 20)
     }
 
-    private var expandButton: some View {
+    private func expandButton(record: DreamRecord) -> some View {
         Button(showFullAnalysis ? String(localized: "interpretation.expand.open") : String(localized: "interpretation.expand.more")) {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                showFullAnalysis = true
-            }
+            openInterpretation(for: record)
         }
         .dreamGoldButton()
         .disabled(showFullAnalysis)
@@ -270,6 +297,10 @@ struct DreamInterpretationView: View {
         VStack(spacing: 10) {
             if !showQuestionInput {
                 Button(String(localized: "interpretation.followup.ask_button")) {
+                    guard featureGate.canAskQuestion() else {
+                        paywallPresenter.present(for: .question)
+                        return
+                    }
                     withAnimation(.easeInOut(duration: 0.2)) {
                         showQuestionInput = true
                     }
@@ -400,6 +431,7 @@ struct DreamInterpretationView: View {
 
     private func resetExpansionState() {
         showFullAnalysis = false
+        showLockedInterpretationPreview = false
         showQuestionInput = false
         questionText = ""
         isQuestionFocused = false
@@ -408,10 +440,40 @@ struct DreamInterpretationView: View {
     private func askQuestion(recordID: UUID) {
         let question = questionText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !question.isEmpty else { return }
+        guard featureGate.canAskQuestion(), featureGate.consumeQuestion() else {
+            paywallPresenter.present(for: .question)
+            return
+        }
         questionText = ""
         isQuestionFocused = false
         Task {
             await viewModel.askFollowUpQuestion(recordID: recordID, question: question)
+        }
+    }
+
+    private func openInterpretation(for record: DreamRecord) {
+        let dreamID = record.id.uuidString
+
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showFullAnalysis = true
+            showLockedInterpretationPreview = !featureGate.isDreamEligibleForPremium(dreamID: dreamID)
+        }
+    }
+
+    private func openPremiumPerspective(for record: DreamRecord) {
+        let dreamID = record.id.uuidString
+        guard featureGate.canUsePremiumPerspective(forDreamID: dreamID) else {
+            paywallPresenter.present(for: .perspective)
+            return
+        }
+        guard featureGate.consumePremiumPerspective(forDreamID: dreamID) else {
+            paywallPresenter.present(for: .perspective)
+            return
+        }
+
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showFullAnalysis = true
+            showLockedInterpretationPreview = false
         }
     }
 

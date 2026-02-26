@@ -120,6 +120,7 @@
 "interpretation.preview.primary_fallback" = "Search for Freedom and Potential.";
 "interpretation.preview.secondary_empty_fallback" = "Symbols indicate subconscious messages and the need for personal transformation.";
 "interpretation.preview.secondary_fallback" = "Flying reflects a wish to overcome obstacles. The elephant points to strength and wisdom.";
+"interpretation.perspective.button" = "Open Premium Perspective";
 "interpretation.tag.elephant" = "Elephant";
 "interpretation.tag.flying" = "Flying";
 "interpretation.tag.freedom" = "Freedom";
@@ -157,3 +158,32 @@
 "mood.neutral" = "Neutral";
 "mood.peaceful" = "Peaceful";
 "mood.scary" = "Scary";
+
+"paywall.title" = "Unlock Premium Guidance";
+"paywall.subtitle" = "Choose your tier to access deeper dream interpretation and unlimited mystical tools.";
+"paywall.billing.monthly" = "Monthly";
+"paywall.billing.yearly" = "Yearly";
+"paywall.plan.basic.name" = "Premium Basic";
+"paywall.plan.plus.name" = "Premium Plus";
+"paywall.plan.plus.badge" = "Most Powerful";
+"paywall.plan.basic.benefit.1" = "2 premium dreams per day";
+"paywall.plan.basic.benefit.2" = "1 AI image per eligible dream";
+"paywall.plan.basic.benefit.3" = "2 premium perspectives per dream";
+"paywall.plan.plus.benefit.1" = "Unlimited premium dreams";
+"paywall.plan.plus.benefit.2" = "Unlimited AI dream images";
+"paywall.plan.plus.benefit.3" = "All premium perspectives and questions";
+"paywall.price.loading" = "Price loading...";
+"paywall.credits.title" = "Credit Packs";
+"paywall.credits.balance_format" = "Current balance: %d";
+"paywall.credits.pack.small" = "+5";
+"paywall.credits.pack.medium" = "+15";
+"paywall.credits.pack.large" = "+40";
+"paywall.button.subscribe" = "Subscribe";
+"paywall.button.subscribing" = "Subscribing...";
+"paywall.button.buy_credits" = "Buy Credits";
+"paywall.button.buying_credits" = "Buying Credits...";
+"paywall.button.restore" = "Restore Purchases";
+"paywall.button.restoring" = "Restoring...";
+
+"locked_preview.title" = "Preview";
+"locked_preview.unlock" = "Unlock full interpretation";

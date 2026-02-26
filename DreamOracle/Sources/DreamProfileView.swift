@@ -3,6 +3,9 @@ import SwiftUI
 struct DreamProfileView: View {
     @ObservedObject var viewModel: DreamInterpreterViewModel
     @Environment(\.usesSharedTabPanoramaBackground) private var usesSharedTabPanoramaBackground
+    #if DEBUG
+    @State private var showDebugEvents = false
+    #endif
 
     var body: some View {
         ZStack {
@@ -23,6 +26,11 @@ struct DreamProfileView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        #if DEBUG
+        .sheet(isPresented: $showDebugEvents) {
+            DebugEventsView()
+        }
+        #endif
     }
 
     private var topBar: some View {
@@ -30,6 +38,11 @@ struct DreamProfileView: View {
             Text(String(localized: "profile.title"))
                 .font(DreamTheme.heading(34))
                 .foregroundStyle(Color.white)
+                #if DEBUG
+                .onLongPressGesture(minimumDuration: 1.2) {
+                    showDebugEvents = true
+                }
+                #endif
             Spacer()
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 34))

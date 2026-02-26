@@ -113,12 +113,14 @@ final class DreamInterpreterViewModel: ObservableObject {
     }
 
     func interpretDreamFromComposer(
+        recordID: UUID = UUID(),
         title: String,
         detailText: String,
         symbols: [String],
         clarity: Double,
         mood: String,
-        source: DreamInputSource = .typed
+        source: DreamInputSource = .typed,
+        shouldGenerateImage: Bool = true
     ) async {
         let trimmedText = detailText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
@@ -176,7 +178,7 @@ final class DreamInterpreterViewModel: ObservableObject {
 
             var previewImageBase64: String?
             var imageWarning: String?
-            if let imageService {
+            if shouldGenerateImage, let imageService {
                 do {
                     let imageData = try await imageService.generateDreamArtwork(
                         title: resolvedTitle,
@@ -196,6 +198,7 @@ final class DreamInterpreterViewModel: ObservableObject {
 
             apply(charge: charge)
             let record = saveDreamRecord(
+                id: recordID,
                 title: resolvedTitle,
                 text: trimmedText,
                 interpretation: fullInterpretation,
@@ -354,6 +357,7 @@ final class DreamInterpreterViewModel: ObservableObject {
     }
 
     private func saveDreamRecord(
+        id: UUID,
         title: String,
         text: String,
         interpretation: String,
@@ -365,6 +369,7 @@ final class DreamInterpreterViewModel: ObservableObject {
         mood: String
     ) -> DreamRecord {
         let record = DreamRecord(
+            id: id,
             title: title,
             source: source,
             dreamText: text,

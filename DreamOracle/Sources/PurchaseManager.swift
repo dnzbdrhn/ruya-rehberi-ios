@@ -7,14 +7,9 @@ final class PurchaseManager: ObservableObject {
     @Published private(set) var isPurchasing = false
 
     private let wallet: CreditWallet
-    private let defaults: UserDefaults
-    private let processedTransactionsKey = "credit_processed_transaction_ids_v1"
-    private var processedTransactionIDs: Set<String>
 
-    init(wallet: CreditWallet, defaults: UserDefaults = .standard) {
+    init(wallet: CreditWallet) {
         self.wallet = wallet
-        self.defaults = defaults
-        processedTransactionIDs = Set(defaults.stringArray(forKey: processedTransactionsKey) ?? [])
 
         Task {
             await fetchCreditProducts()
@@ -35,7 +30,10 @@ final class PurchaseManager: ObservableObject {
 
     @discardableResult
     func purchaseCreditProduct(id productID: String) async -> Bool {
-        guard ProductIDs.creditAmount(for: productID) != nil else { return false }
+        guard ProductIDs.creditAmount(for: productID) != nil else {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: "invalid_credit_product"))
+            return false
+        }
 
         let product: Product?
         if let cachedProduct = creditProducts.first(where: { $0.id == productID }) {
@@ -43,7 +41,10 @@ final class PurchaseManager: ObservableObject {
         } else {
             product = try? await Product.products(for: [productID]).first
         }
-        guard let product else { return false }
+        guard let product else {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: "product_not_found"))
+            return false
+        }
 
         isPurchasing = true
         defer { isPurchasing = false }
@@ -58,14 +59,22 @@ final class PurchaseManager: ObservableObject {
                 }
 
                 let granted = applyCreditsIfNeeded(for: transaction)
+                if granted {
+                    Analytics.log(.purchaseSuccess(productID: transaction.productID))
+                } else {
+                    Analytics.log(.purchaseFail(productID: transaction.productID, errorDescription: "credits_not_granted"))
+                }
                 await transaction.finish()
                 return granted
             case .pending, .userCancelled:
+                Analytics.log(.purchaseFail(productID: productID, errorDescription: "pending_or_cancelled"))
                 return false
             @unknown default:
+                Analytics.log(.purchaseFail(productID: productID, errorDescription: "unknown_purchase_result"))
                 return false
             }
         } catch {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: error.localizedDescription))
             logNonFatal(error, context: "purchase_credit_product")
             return false
         }
@@ -90,21 +99,11 @@ final class PurchaseManager: ObservableObject {
     @discardableResult
     private func applyCreditsIfNeeded(for transaction: Transaction) -> Bool {
         let txID = String(transaction.id)
-        guard !processedTransactionIDs.contains(txID) else {
-            return false
-        }
         guard let credits = ProductIDs.creditAmount(for: transaction.productID) else {
             return false
         }
 
-        wallet.addCredits(amount: credits)
-        processedTransactionIDs.insert(txID)
-        persistProcessedTransactionIDs()
-        return true
-    }
-
-    private func persistProcessedTransactionIDs() {
-        defaults.set(Array(processedTransactionIDs), forKey: processedTransactionsKey)
+        return wallet.addCredits(amount: credits, transactionID: txID)
     }
 
     private func logNonFatal(_ error: Error, context: String) {

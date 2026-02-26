@@ -120,6 +120,7 @@
 "interpretation.preview.primary_fallback" = "Özgürlük Arayışı ve Potansiyel.";
 "interpretation.preview.secondary_empty_fallback" = "Semboller, bilinçdışı mesajları ve kişisel dönüşüm ihtiyacını işaret ediyor.";
 "interpretation.preview.secondary_fallback" = "Uçmak, engelleri aşma isteğini simgeler. Fil, güç ve bilgelik temasıyla ilerler.";
+"interpretation.perspective.button" = "Premium Perspektif Aç";
 "interpretation.tag.elephant" = "Fil";
 "interpretation.tag.flying" = "Uçmak";
 "interpretation.tag.freedom" = "Özgürlük";
@@ -157,3 +158,32 @@
 "mood.neutral" = "Nötr";
 "mood.peaceful" = "Huzurlu";
 "mood.scary" = "Korkunç";
+
+"paywall.title" = "Premium Rehberliği Aç";
+"paywall.subtitle" = "Daha derin rüya yorumları ve sınırsız mistik araçlar için planını seç.";
+"paywall.billing.monthly" = "Aylık";
+"paywall.billing.yearly" = "Yıllık";
+"paywall.plan.basic.name" = "Premium Basic";
+"paywall.plan.plus.name" = "Premium Plus";
+"paywall.plan.plus.badge" = "En Güçlü";
+"paywall.plan.basic.benefit.1" = "Günde 2 premium rüya";
+"paywall.plan.basic.benefit.2" = "Uygun rüya başına 1 AI görsel";
+"paywall.plan.basic.benefit.3" = "Rüya başına 2 premium perspektif";
+"paywall.plan.plus.benefit.1" = "Sınırsız premium rüya";
+"paywall.plan.plus.benefit.2" = "Sınırsız AI rüya görseli";
+"paywall.plan.plus.benefit.3" = "Tüm premium perspektif ve sorular";
+"paywall.price.loading" = "Fiyat yükleniyor...";
+"paywall.credits.title" = "Kredi Paketleri";
+"paywall.credits.balance_format" = "Mevcut bakiye: %d";
+"paywall.credits.pack.small" = "+5";
+"paywall.credits.pack.medium" = "+15";
+"paywall.credits.pack.large" = "+40";
+"paywall.button.subscribe" = "Abone Ol";
+"paywall.button.subscribing" = "Abone olunuyor...";
+"paywall.button.buy_credits" = "Kredi Satın Al";
+"paywall.button.buying_credits" = "Kredi satın alınıyor...";
+"paywall.button.restore" = "Satın Alımları Geri Yükle";
+"paywall.button.restoring" = "Geri yükleniyor...";
+
+"locked_preview.title" = "Önizleme";
+"locked_preview.unlock" = "Tam yorumu aç";

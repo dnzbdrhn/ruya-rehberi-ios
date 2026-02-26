@@ -56,6 +56,48 @@ final class EntitlementManager: ObservableObject {
         }
     }
 
+    @discardableResult
+    func purchase(productID: String) async -> Bool {
+        let isSubscription = ProductIDs.premiumBasic.contains(productID) || ProductIDs.premiumPlus.contains(productID)
+        guard isSubscription else {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: "invalid_subscription_product"))
+            return false
+        }
+
+        let product: Product?
+        if let cachedProduct = products.first(where: { $0.id == productID }) {
+            product = cachedProduct
+        } else {
+            product = try? await Product.products(for: [productID]).first
+        }
+        guard let product else {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: "product_not_found"))
+            return false
+        }
+
+        do {
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification):
+                let transaction = try Self.checkVerified(verification)
+                await transaction.finish()
+                await refreshEntitlements()
+                Analytics.log(.purchaseSuccess(productID: productID))
+                return true
+            case .pending, .userCancelled:
+                Analytics.log(.purchaseFail(productID: productID, errorDescription: "pending_or_cancelled"))
+                return false
+            @unknown default:
+                Analytics.log(.purchaseFail(productID: productID, errorDescription: "unknown_purchase_result"))
+                return false
+            }
+        } catch {
+            Analytics.log(.purchaseFail(productID: productID, errorDescription: error.localizedDescription))
+            logNonFatal(error, context: "purchase_subscription")
+            return false
+        }
+    }
+
     private func observeTransactionUpdates() -> Task<Void, Never> {
         Task { [weak self] in
             for await update in Transaction.updates {

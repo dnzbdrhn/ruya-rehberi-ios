@@ -31,6 +31,7 @@ private enum DreamTab: Int, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @ObservedObject var viewModel: DreamInterpreterViewModel
+    @EnvironmentObject private var paywallPresenter: PaywallPresenter
     @State private var selectedTab: DreamTab = .home
     @State private var showComposer = false
     @State private var composerStartsWithVoice = false
@@ -124,6 +125,21 @@ struct ContentView: View {
                     onBack: { showInterpretation = false }
                 )
             }
+        }
+        .sheet(
+            isPresented: Binding(
+                get: { paywallPresenter.isShowing && !showComposer && !showInterpretation },
+                set: { isPresented in
+                    if !isPresented {
+                        paywallPresenter.dismiss()
+                    }
+                }
+            )
+        ) {
+            NavigationStack {
+                PaywallView()
+            }
+            .presentationDragIndicator(.visible)
         }
     }
 

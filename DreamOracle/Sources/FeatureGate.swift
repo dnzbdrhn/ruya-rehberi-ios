@@ -39,12 +39,13 @@ final class FeatureGate: ObservableObject {
         self.calendar = calendar
 
         if let cachedDate = defaults.object(forKey: Keys.lastResetDate) as? Date {
-            lastResetDate = cachedDate
+            lastResetDate = calendar.startOfDay(for: cachedDate)
         } else {
             lastResetDate = calendar.startOfDay(for: Date())
         }
 
-        dreamsUsedTodayForPremium = defaults.stringArray(forKey: Keys.dreamsUsedTodayForPremium) ?? []
+        let storedDreams = defaults.stringArray(forKey: Keys.dreamsUsedTodayForPremium) ?? []
+        dreamsUsedTodayForPremium = Self.deduplicatedDreamIDs(storedDreams)
         questionsUsedToday = max(0, defaults.integer(forKey: Keys.questionsUsedToday))
 
         if
@@ -201,7 +202,7 @@ final class FeatureGate: ObservableObject {
     private func resetDailyUsageIfNeeded() {
         let todayStart = calendar.startOfDay(for: Date())
         let storedStart = calendar.startOfDay(for: lastResetDate)
-        guard todayStart != storedStart else { return }
+        guard !calendar.isDate(todayStart, inSameDayAs: storedStart) else { return }
 
         lastResetDate = todayStart
         dreamsUsedTodayForPremium = []
@@ -212,7 +213,9 @@ final class FeatureGate: ObservableObject {
 
     private func persistUsageState() {
         defaults.set(lastResetDate, forKey: Keys.lastResetDate)
-        defaults.set(dreamsUsedTodayForPremium, forKey: Keys.dreamsUsedTodayForPremium)
+        let uniqueDreamIDs = Self.deduplicatedDreamIDs(dreamsUsedTodayForPremium)
+        dreamsUsedTodayForPremium = uniqueDreamIDs
+        defaults.set(uniqueDreamIDs, forKey: Keys.dreamsUsedTodayForPremium)
         defaults.set(questionsUsedToday, forKey: Keys.questionsUsedToday)
 
         if let encodedUsage = try? JSONEncoder().encode(perDreamUsage) {
@@ -220,5 +223,14 @@ final class FeatureGate: ObservableObject {
         } else {
             defaults.removeObject(forKey: Keys.perDreamUsage)
         }
+    }
+
+    private static func deduplicatedDreamIDs(_ ids: [String]) -> [String] {
+        var seen = Set<String>()
+        var unique: [String] = []
+        for id in ids where seen.insert(id).inserted {
+            unique.append(id)
+        }
+        return unique
     }
 }
