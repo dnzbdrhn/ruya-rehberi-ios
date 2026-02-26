@@ -15,7 +15,7 @@ Rules:
   - 3 lifetime free interpretations total
   - After free quota: 1 interpretation = 1 credit
   - AI image generation = 2 credits
-  - Philosophy modes = Premium-only
+  - Only `Nötr` and `Bilişsel-Davranışsal` philosophy modes are free
 - Premium subscribers:
   - Unlimited interpretations
   - Unlimited AI images
@@ -35,12 +35,36 @@ Each interpretation must output 3 sections:
 3) Practical reflection (1–3 actionable suggestions)
 Avoid medical/legal claims and deterministic statements.
 
-Philosophy modes (Premium-only):
-- Modern psychology
-- Jungian archetypes
-- Freudian
-- Symbolic/Mythic
-- Islamic tradition style (if included: probabilistic, not absolute)
+Philosophy modes:
+- POPULAR:
+  - Astrolojik Lens
+  - Çekim Yasası
+  - Stoa Felsefesi
+- PSYCHOLOGICAL:
+  - Nötr (Free)
+  - Bilişsel-Davranışsal (Free)
+  - Jung Arketipleri
+  - Freud Analizi
+  - Gestalt Terapisi
+- SCIENTIFIC:
+  - Nörobilim Görüşü
+- SPIRITUAL & RELIGIOUS:
+  - İslami Perspektif
+  - Sufi Mistisizmi
+  - Hristiyan Perspektifi
+  - Yahudi Geleneği
+  - Kabalist Mistisizmi
+  - Hindu Sembolizmi
+  - Budist Yaklaşımı
+  - Taoist / Çin Halk
+  - Shinto (Japon)
+  - Yerli / Şamanik
+
+Philosophy mode rules:
+- Only `Nötr` and `Bilişsel-Davranışsal` are free; all other modes are Premium-only.
+- Each philosophy mode must produce a tone-specific interpretation style.
+- All philosophy modes must use probabilistic language.
+- Never use deterministic or absolute claims in any mode.
 
 ## Architecture rules
 - Use StoreKit 2 for IAP.
