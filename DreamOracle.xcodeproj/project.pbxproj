@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		A1F9C3F12C8A4D1200AA1001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1F9C3F02C8A4D1200AA1001 /* Localizable.strings */; };
+		A1F9C4202C8B4E2200AA1001 /* EntitlementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4232C8B4E2200AA1001 /* EntitlementManager.swift */; };
+		A1F9C4212C8B4E2200AA1001 /* ProductIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4242C8B4E2200AA1001 /* ProductIDs.swift */; };
+		A1F9C4222C8B4E2200AA1001 /* SubscriptionTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4252C8B4E2200AA1001 /* SubscriptionTier.swift */; };
+		A1F9C4302C8B4F2200AA1001 /* CreditWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4332C8B4F2200AA1001 /* CreditWallet.swift */; };
+		A1F9C4312C8B4F2200AA1001 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4342C8B4F2200AA1001 /* PurchaseManager.swift */; };
+		A1F9C4402C8B502200AA1001 /* FeatureGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F9C4432C8B502200AA1001 /* FeatureGate.swift */; };
 		0E98D9C2A42363B606E56115 /* DreamInterpretationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */; };
 		1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769850A7924593ADFD99B0BD /* DreamTheme.swift */; };
 		22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */ = {isa = PBXBuildFile; fileRef = F80B1DA8D1973537461737E9 /* arkaplan_new.png */; };
@@ -50,6 +56,12 @@
 		F80B1DA8D1973537461737E9 /* arkaplan_new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arkaplan_new.png; sourceTree = "<group>"; };
 		A1F9C3F22C8A4D1200AA1001 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A1F9C3F32C8A4D1200AA1001 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1F9C4232C8B4E2200AA1001 /* EntitlementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementManager.swift; sourceTree = "<group>"; };
+		A1F9C4242C8B4E2200AA1001 /* ProductIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductIDs.swift; sourceTree = "<group>"; };
+		A1F9C4252C8B4E2200AA1001 /* SubscriptionTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTier.swift; sourceTree = "<group>"; };
+		A1F9C4332C8B4F2200AA1001 /* CreditWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditWallet.swift; sourceTree = "<group>"; };
+		A1F9C4342C8B4F2200AA1001 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		A1F9C4432C8B502200AA1001 /* FeatureGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureGate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -69,6 +81,9 @@
 			children = (
 				9C5FF7E64D0B46C9CBDF0F99 /* AudioRecorder.swift */,
 				2C0330D4D45412A507E8ACA4 /* ContentView.swift */,
+				A1F9C4332C8B4F2200AA1001 /* CreditWallet.swift */,
+				A1F9C4232C8B4E2200AA1001 /* EntitlementManager.swift */,
+				A1F9C4432C8B502200AA1001 /* FeatureGate.swift */,
 				2F3DD212FF326452F5A807E2 /* DreamCalendarView.swift */,
 				D253BC4F542BBC61BB18D688 /* DreamComposerView.swift */,
 				AFA4C93D05743FA9A672BDB7 /* DreamDetailView.swift */,
@@ -78,7 +93,10 @@
 				EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */,
 				74447E6461513642E8481C36 /* DreamModels.swift */,
 				7EE714A0506A271661A117C6 /* DreamOracleApp.swift */,
+				A1F9C4242C8B4E2200AA1001 /* ProductIDs.swift */,
 				CD57AA43B831D540C14917E4 /* DreamProfileView.swift */,
+				A1F9C4342C8B4F2200AA1001 /* PurchaseManager.swift */,
+				A1F9C4252C8B4E2200AA1001 /* SubscriptionTier.swift */,
 				769850A7924593ADFD99B0BD /* DreamTheme.swift */,
 				317F066047EFBC7A0BFDA91A /* GeminiImageService.swift */,
 				5FEAF04EB517670381F0BA85 /* OpenAIService.swift */,
@@ -192,6 +210,9 @@
 			files = (
 				B52876C49EA3DD1AFE6B97D0 /* AudioRecorder.swift in Sources */,
 				706958117229F63150A091C5 /* ContentView.swift in Sources */,
+				A1F9C4302C8B4F2200AA1001 /* CreditWallet.swift in Sources */,
+				A1F9C4202C8B4E2200AA1001 /* EntitlementManager.swift in Sources */,
+				A1F9C4402C8B502200AA1001 /* FeatureGate.swift in Sources */,
 				35791448D2B551B00684B08A /* DreamCalendarView.swift in Sources */,
 				A9B830DDE88CCFE92701BD85 /* DreamComposerView.swift in Sources */,
 				66F110C85C7123DC0092C3F0 /* DreamDetailView.swift in Sources */,
@@ -201,7 +222,10 @@
 				275493F4B225F3985B883BCD /* DreamInterpreterViewModel.swift in Sources */,
 				3A10A610C9B7955D3D9AAFB0 /* DreamModels.swift in Sources */,
 				51F07E59A250DDF5EF8EE5E1 /* DreamOracleApp.swift in Sources */,
+				A1F9C4212C8B4E2200AA1001 /* ProductIDs.swift in Sources */,
 				ECCCDBC70E8D52FFF85C788F /* DreamProfileView.swift in Sources */,
+				A1F9C4312C8B4F2200AA1001 /* PurchaseManager.swift in Sources */,
+				A1F9C4222C8B4E2200AA1001 /* SubscriptionTier.swift in Sources */,
 				1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */,
 				6A16D4CD3EE6E4B853FFD3C1 /* GeminiImageService.swift in Sources */,
 				445F83930DEE9F12C6E9930A /* OpenAIService.swift in Sources */,
