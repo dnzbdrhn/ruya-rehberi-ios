@@ -28,11 +28,23 @@ xcodegen generate
 ```bash
 open DreamOracle.xcodeproj
 ```
-4. `DreamOracle/Sources/OwnerSecrets.swift` dosyasinda `openAIAPIKey` degerini kendi key'in ile doldur.
-5. Simulatorde veya cihazda calistir.
+4. `Secrets.xcconfig.example` dosyasini `Secrets.xcconfig` olarak kopyala:
+```bash
+cp Secrets.xcconfig.example Secrets.xcconfig
+```
+5. `Secrets.xcconfig` icinde `OPENAI_API_KEY` (ve gerekiyorsa `GEMINI_API_KEY`) degerlerini doldur.
+6. Simulatorde veya cihazda calistir.
 
-Alternatif:
-- Xcode'da `DreamOracle` target'i icin `Build Settings` altinda `OPENAI_API_KEY` degeri verilirse uygulama onu da kullanir.
+## OpenAI API key (local development)
+
+Uygulama OpenAI key'i su sirayla yukler:
+1. `Info.plist` icindeki `OPENAI_API_KEY` (Xcode Build Setting'den gelir)
+2. Ortam degiskeni `OPENAI_API_KEY` (fallback)
+
+Onerilen yontem:
+- `Secrets.xcconfig` dosyasini yerelde kullan
+- Bu dosyayi commit etme (`.gitignore` icinde)
+- Proje Debug config'inde `Secrets.xcconfig` otomatik okunur
 
 ## Ucretlendirme Kurallari
 
@@ -43,5 +55,4 @@ Alternatif:
 
 ## Notlar
 
-- Demo kolayligi icin API key dogrudan uygulamaya veriliyor.
 - Uretim ortaminda API key'i istemcide tutma; kendi backend'in uzerinden proxy et.

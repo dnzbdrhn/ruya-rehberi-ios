@@ -9,6 +9,8 @@ targets:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
+    configFiles:
+      Debug: Secrets.xcconfig
     sources:
       - path: DreamOracle/Sources
         excludes:

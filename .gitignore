@@ -22,3 +22,8 @@ fastlane/test_output
 
 # Secrets
 *.env
+Secrets.xcconfig
+Secrets.xcconfig
+OwnerSecrets.swift
+DreamOracle/Sources/OwnerSecrets.swift
+DreamOracle/Sources/OwnerSecrets.swift

@@ -33,7 +33,7 @@ final class DreamInterpreterViewModel: ObservableObject {
         let openAIKey = Self.resolvedOpenAIAPIKey()
         if openAIKey.isEmpty {
             service = nil
-            errorMessage = "Owner API key eksik. OwnerSecrets.swift icine key girin."
+            errorMessage = "OPENAI_API_KEY eksik. Secrets.xcconfig veya ortami degiskenini ayarlayin."
         } else {
             service = OpenAIService(apiKey: openAIKey)
         }
@@ -446,15 +446,18 @@ final class DreamInterpreterViewModel: ObservableObject {
     }
 
     private static func resolvedOpenAIAPIKey() -> String {
-        let bundled = ((Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String) ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let bundled = normalizedAPIKey(
+            (Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String) ?? ""
+        )
         if isValidOpenAIAPIKey(bundled) {
             return bundled
         }
 
-        let hardcoded = OwnerSecrets.openAIAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        if isValidOpenAIAPIKey(hardcoded) {
-            return hardcoded
+        let fromEnvironment = normalizedAPIKey(
+            ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
+        )
+        if isValidOpenAIAPIKey(fromEnvironment) {
+            return fromEnvironment
         }
 
         return ""
@@ -477,6 +480,12 @@ final class DreamInterpreterViewModel: ObservableObject {
 
     private static func isValidOpenAIAPIKey(_ value: String) -> Bool {
         !value.isEmpty && !value.contains("$(") && value.hasPrefix("sk-")
+    }
+
+    private static func normalizedAPIKey(_ rawValue: String) -> String {
+        rawValue
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     }
 
     private static func isValidGeminiAPIKey(_ value: String) -> Bool {
