@@ -255,6 +255,52 @@ final class DreamInterpreterViewModel: ObservableObject {
         persistState()
     }
 
+    @discardableResult
+    func saveDreamDraftFromComposer(
+        title: String,
+        detailText: String,
+        symbols: [String],
+        clarity: Double,
+        mood: String,
+        source: DreamInputSource
+    ) -> UUID? {
+        let trimmedText = detailText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else {
+            errorMessage = "Ruya anlatimi bos olamaz."
+            return nil
+        }
+
+        let mergedKeywords = mergedSymbols(
+            manual: symbols,
+            generated: [],
+            fallbackFrom: trimmedText
+        )
+
+        let resolved = resolvedTitle(
+            manualTitle: title,
+            generatedTitle: nil,
+            keywords: mergedKeywords,
+            dreamText: trimmedText
+        )
+
+        let record = saveDreamRecord(
+            id: UUID(),
+            title: resolved,
+            text: trimmedText,
+            interpretation: "",
+            previewSummary: condensedPreview(from: trimmedText),
+            previewImageBase64: nil,
+            source: source,
+            symbols: mergedKeywords,
+            clarity: clarity,
+            mood: mood
+        )
+
+        selectedRecordID = record.id
+        persistState()
+        return record.id
+    }
+
     func askFollowUpQuestion(recordID: UUID, question: String) async {
         let trimmedQuestion = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuestion.isEmpty else { return }
@@ -368,8 +414,11 @@ final class DreamInterpreterViewModel: ObservableObject {
         clarity: Double,
         mood: String
     ) -> DreamRecord {
+        let existing = dreamRecords.first(where: { $0.id == id })
+
         let record = DreamRecord(
             id: id,
+            createdAt: existing?.createdAt ?? Date(),
             title: title,
             source: source,
             dreamText: text,
@@ -380,6 +429,19 @@ final class DreamInterpreterViewModel: ObservableObject {
             clarity: min(max(clarity, 0), 1),
             mood: mood
         )
+
+        if let existing {
+            // Preserve user-owned metadata when refreshing a saved draft with interpretation output.
+            var updatedRecord = record
+            updatedRecord.isFavorite = existing.isFavorite
+            updatedRecord.followUps = existing.followUps
+            if let index = dreamRecords.firstIndex(where: { $0.id == id }) {
+                dreamRecords.remove(at: index)
+            }
+            dreamRecords.insert(updatedRecord, at: 0)
+            return updatedRecord
+        }
+
         dreamRecords.insert(record, at: 0)
         return record
     }

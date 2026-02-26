@@ -71,7 +71,10 @@
 "composer.rebuilder.remaining_format" = "%d KALDI";
 "composer.rebuilder.subtitle" = "Anahtar kelimeleri detaylı rüyalara dönüştürün";
 "composer.rebuilder.title" = "Rüya Yardımcısı";
+"composer.interpret_now" = "Şimdi yorumla";
+"composer.saved_success" = "Rüya başarıyla kaydedildi.";
 "composer.save" = "Kaydet";
+"composer.skip_for_now" = "Şimdilik geç";
 "composer.title" = "Yeni Rüya";
 
 "dictionary.entry.bird" = "Kuş";

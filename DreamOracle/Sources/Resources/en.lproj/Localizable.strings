@@ -71,7 +71,10 @@
 "composer.rebuilder.remaining_format" = "%d LEFT";
 "composer.rebuilder.subtitle" = "Turn keywords into detailed dreams";
 "composer.rebuilder.title" = "Dream Assistant";
+"composer.interpret_now" = "Interpret now";
+"composer.saved_success" = "Dream saved successfully.";
 "composer.save" = "Save";
+"composer.skip_for_now" = "Skip for now";
 "composer.title" = "New Dream";
 
 "dictionary.entry.bird" = "Bird";

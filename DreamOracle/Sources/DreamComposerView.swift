@@ -1,6 +1,14 @@
 import SwiftUI
 
 struct DreamComposerView: View {
+    private struct PendingInterpretationContext {
+        let recordID: UUID
+        let detailText: String
+        let clarity: Double
+        let mood: String
+        let source: DreamInputSource
+    }
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var featureGate: FeatureGate
     @EnvironmentObject private var paywallPresenter: PaywallPresenter
@@ -18,6 +26,9 @@ struct DreamComposerView: View {
 
     @State private var isRebuilderExpanded = false
     @State private var fragmentsText = ""
+    @State private var showPostSaveSheet = false
+    @State private var pendingInterpretationContext: PendingInterpretationContext?
+    @State private var showSavedSuccessMessage = false
 
     @FocusState private var isDetailFocused: Bool
     @FocusState private var isFragmentsFocused: Bool
@@ -75,6 +86,20 @@ struct DreamComposerView: View {
                 PaywallView()
             }
             .presentationDragIndicator(.visible)
+        }
+        .confirmationDialog(
+            String(localized: "composer.saved_success"),
+            isPresented: $showPostSaveSheet,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "composer.interpret_now")) {
+                interpretSavedDream()
+            }
+            Button(String(localized: "composer.skip_for_now")) {
+                showSavedSuccessMessage = false
+                dismiss()
+            }
+            Button(String(localized: "common.close"), role: .cancel) {}
         }
     }
 
@@ -371,6 +396,12 @@ struct DreamComposerView: View {
 
     @ViewBuilder
     private var messages: some View {
+        if showSavedSuccessMessage {
+            Text(String(localized: "composer.saved_success"))
+                .font(DreamTheme.medium(13))
+                .foregroundStyle(Color.green.opacity(0.95))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
         if let info = viewModel.infoMessage {
             Text(info)
                 .font(DreamTheme.medium(13))
@@ -422,10 +453,40 @@ struct DreamComposerView: View {
         guard !detail.isEmpty else { return }
 
         let source: DreamInputSource = usedVoiceInput ? .voice : .typed
-        let pendingRecordID = UUID()
-        var shouldGenerateImage = featureGate.canUseImage(forDreamID: pendingRecordID.uuidString)
+        let clarity = (claritySun + clarityMoon) / 2
+
+        guard
+            let savedRecordID = viewModel.saveDreamDraftFromComposer(
+                title: "",
+                detailText: detail,
+                symbols: [],
+                clarity: clarity,
+                mood: selectedMoodValue,
+                source: source
+            )
+        else {
+            return
+        }
+
+        pendingInterpretationContext = PendingInterpretationContext(
+            recordID: savedRecordID,
+            detailText: detail,
+            clarity: clarity,
+            mood: selectedMoodValue,
+            source: source
+        )
+        showSavedSuccessMessage = true
+        showPostSaveSheet = true
+    }
+
+    private func interpretSavedDream() {
+        guard let context = pendingInterpretationContext else { return }
+
+        showSavedSuccessMessage = false
+
+        var shouldGenerateImage = featureGate.canUseImage(forDreamID: context.recordID.uuidString)
         if shouldGenerateImage {
-            shouldGenerateImage = featureGate.consumeImage(forDreamID: pendingRecordID.uuidString)
+            shouldGenerateImage = featureGate.consumeImage(forDreamID: context.recordID.uuidString)
         }
         if !shouldGenerateImage {
             paywallPresenter.present(for: .image)
@@ -433,13 +494,13 @@ struct DreamComposerView: View {
 
         Task {
             await viewModel.interpretDreamFromComposer(
-                recordID: pendingRecordID,
+                recordID: context.recordID,
                 title: "",
-                detailText: detail,
+                detailText: context.detailText,
                 symbols: [],
-                clarity: (claritySun + clarityMoon) / 2,
-                mood: selectedMoodValue,
-                source: source,
+                clarity: context.clarity,
+                mood: context.mood,
+                source: context.source,
                 shouldGenerateImage: shouldGenerateImage
             )
 
