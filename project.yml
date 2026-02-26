@@ -1,0 +1,40 @@
+name: DreamOracle
+options:
+  minimumXcodeGenVersion: 2.38.0
+configs:
+  Debug: debug
+  Release: release
+targets:
+  DreamOracle:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: DreamOracle/Sources
+        excludes:
+          - Resources/**
+      - path: DreamOracle/Sources/Resources/arkaplan.png
+        buildPhase: resources
+      - path: DreamOracle/Sources/Resources/arkaplan_new.png
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.deniz.dreamoracle
+        PRODUCT_NAME: DreamOracle
+        SWIFT_VERSION: 5.9
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        OPENAI_API_KEY: ""
+        GEMINI_API_KEY: ""
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: RuyaYorum
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: Ruya anlatimini kaydetmek icin mikrofona ihtiyac var.
+        INFOPLIST_KEY_OPENAI_API_KEY: "$(OPENAI_API_KEY)"
+        INFOPLIST_KEY_GEMINI_API_KEY: "$(GEMINI_API_KEY)"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleDarkContent
+    scheme:
+      gatherCoverageData: false

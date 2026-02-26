@@ -1,0 +1,24 @@
+# Xcode
+.DS_Store
+DerivedData/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# CocoaPods / Carthage (kullanıyorsan)
+Pods/
+Carthage/Build/
+
+# Fastlane (kullanıyorsan)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Secrets
+*.env

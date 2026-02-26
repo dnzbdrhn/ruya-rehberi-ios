@@ -1,0 +1,400 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E98D9C2A42363B606E56115 /* DreamInterpretationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */; };
+		1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769850A7924593ADFD99B0BD /* DreamTheme.swift */; };
+		22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */ = {isa = PBXBuildFile; fileRef = F80B1DA8D1973537461737E9 /* arkaplan_new.png */; };
+		275493F4B225F3985B883BCD /* DreamInterpreterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */; };
+		35791448D2B551B00684B08A /* DreamCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3DD212FF326452F5A807E2 /* DreamCalendarView.swift */; };
+		3A10A610C9B7955D3D9AAFB0 /* DreamModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74447E6461513642E8481C36 /* DreamModels.swift */; };
+		445F83930DEE9F12C6E9930A /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FEAF04EB517670381F0BA85 /* OpenAIService.swift */; };
+		44DD0D38B447FE26D133D24C /* arkaplan.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D99036A1666A6D00E90C6DA /* arkaplan.png */; };
+		51F07E59A250DDF5EF8EE5E1 /* DreamOracleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE714A0506A271661A117C6 /* DreamOracleApp.swift */; };
+		5DF32B088E3ADEC0F67FB319 /* DreamDictionaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30164EF9C5927C78D998E04 /* DreamDictionaryView.swift */; };
+		66F110C85C7123DC0092C3F0 /* DreamDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFA4C93D05743FA9A672BDB7 /* DreamDetailView.swift */; };
+		6A16D4CD3EE6E4B853FFD3C1 /* GeminiImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F066047EFBC7A0BFDA91A /* GeminiImageService.swift */; };
+		706958117229F63150A091C5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0330D4D45412A507E8ACA4 /* ContentView.swift */; };
+		7E879F655D09BD05241D9663 /* DreamHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DB1D836029CEF9CFD23E1C /* DreamHomeView.swift */; };
+		9BE8BD5495EAB744F36F19C6 /* OwnerSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1935C11DC9189E6F021F5D /* OwnerSecrets.swift */; };
+		A9B830DDE88CCFE92701BD85 /* DreamComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D253BC4F542BBC61BB18D688 /* DreamComposerView.swift */; };
+		B52876C49EA3DD1AFE6B97D0 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5FF7E64D0B46C9CBDF0F99 /* AudioRecorder.swift */; };
+		ECCCDBC70E8D52FFF85C788F /* DreamProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD57AA43B831D540C14917E4 /* DreamProfileView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D1935C11DC9189E6F021F5D /* OwnerSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerSecrets.swift; sourceTree = "<group>"; };
+		26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamInterpretationView.swift; sourceTree = "<group>"; };
+		27DB1D836029CEF9CFD23E1C /* DreamHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamHomeView.swift; sourceTree = "<group>"; };
+		2C0330D4D45412A507E8ACA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2F3DD212FF326452F5A807E2 /* DreamCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamCalendarView.swift; sourceTree = "<group>"; };
+		317F066047EFBC7A0BFDA91A /* GeminiImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiImageService.swift; sourceTree = "<group>"; };
+		5FEAF04EB517670381F0BA85 /* OpenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
+		6D99036A1666A6D00E90C6DA /* arkaplan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arkaplan.png; sourceTree = "<group>"; };
+		6ECA7F824CD31925E8CB7A38 /* DreamOracle.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DreamOracle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74447E6461513642E8481C36 /* DreamModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamModels.swift; sourceTree = "<group>"; };
+		769850A7924593ADFD99B0BD /* DreamTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamTheme.swift; sourceTree = "<group>"; };
+		7EE714A0506A271661A117C6 /* DreamOracleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamOracleApp.swift; sourceTree = "<group>"; };
+		9C5FF7E64D0B46C9CBDF0F99 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		AFA4C93D05743FA9A672BDB7 /* DreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailView.swift; sourceTree = "<group>"; };
+		CD57AA43B831D540C14917E4 /* DreamProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamProfileView.swift; sourceTree = "<group>"; };
+		D253BC4F542BBC61BB18D688 /* DreamComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamComposerView.swift; sourceTree = "<group>"; };
+		E30164EF9C5927C78D998E04 /* DreamDictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDictionaryView.swift; sourceTree = "<group>"; };
+		EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamInterpreterViewModel.swift; sourceTree = "<group>"; };
+		F80B1DA8D1973537461737E9 /* arkaplan_new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arkaplan_new.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3E103F93EB6675D539D79374 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F80B1DA8D1973537461737E9 /* arkaplan_new.png */,
+				6D99036A1666A6D00E90C6DA /* arkaplan.png */,
+			);
+			name = Resources;
+			path = DreamOracle/Sources/Resources;
+			sourceTree = "<group>";
+		};
+		409D55A747D5A735F4A0C775 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				9C5FF7E64D0B46C9CBDF0F99 /* AudioRecorder.swift */,
+				2C0330D4D45412A507E8ACA4 /* ContentView.swift */,
+				2F3DD212FF326452F5A807E2 /* DreamCalendarView.swift */,
+				D253BC4F542BBC61BB18D688 /* DreamComposerView.swift */,
+				AFA4C93D05743FA9A672BDB7 /* DreamDetailView.swift */,
+				E30164EF9C5927C78D998E04 /* DreamDictionaryView.swift */,
+				27DB1D836029CEF9CFD23E1C /* DreamHomeView.swift */,
+				26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */,
+				EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */,
+				74447E6461513642E8481C36 /* DreamModels.swift */,
+				7EE714A0506A271661A117C6 /* DreamOracleApp.swift */,
+				CD57AA43B831D540C14917E4 /* DreamProfileView.swift */,
+				769850A7924593ADFD99B0BD /* DreamTheme.swift */,
+				317F066047EFBC7A0BFDA91A /* GeminiImageService.swift */,
+				5FEAF04EB517670381F0BA85 /* OpenAIService.swift */,
+				1D1935C11DC9189E6F021F5D /* OwnerSecrets.swift */,
+			);
+			name = Sources;
+			path = DreamOracle/Sources;
+			sourceTree = "<group>";
+		};
+		45E68203ECBDF0CCC293CE5B = {
+			isa = PBXGroup;
+			children = (
+				3E103F93EB6675D539D79374 /* Resources */,
+				409D55A747D5A735F4A0C775 /* Sources */,
+				B570730CE017E9B3ED171A48 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B570730CE017E9B3ED171A48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6ECA7F824CD31925E8CB7A38 /* DreamOracle.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1A70925EED5DEBE4BD8DE4A /* DreamOracle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D87DF01EDD825A75A2BBE52 /* Build configuration list for PBXNativeTarget "DreamOracle" */;
+			buildPhases = (
+				84761B9CF6ADB09BC5487D05 /* Sources */,
+				9BB01A981030E935773BEAEA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DreamOracle;
+			packageProductDependencies = (
+			);
+			productName = DreamOracle;
+			productReference = 6ECA7F824CD31925E8CB7A38 /* DreamOracle.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		847AE13DF0D724662C8AD3E1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					A1A70925EED5DEBE4BD8DE4A = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = FCA7519E17C82EDA1160FF85 /* Build configuration list for PBXProject "DreamOracle" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 45E68203ECBDF0CCC293CE5B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 54;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1A70925EED5DEBE4BD8DE4A /* DreamOracle */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9BB01A981030E935773BEAEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44DD0D38B447FE26D133D24C /* arkaplan.png in Resources */,
+				22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		84761B9CF6ADB09BC5487D05 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B52876C49EA3DD1AFE6B97D0 /* AudioRecorder.swift in Sources */,
+				706958117229F63150A091C5 /* ContentView.swift in Sources */,
+				35791448D2B551B00684B08A /* DreamCalendarView.swift in Sources */,
+				A9B830DDE88CCFE92701BD85 /* DreamComposerView.swift in Sources */,
+				66F110C85C7123DC0092C3F0 /* DreamDetailView.swift in Sources */,
+				5DF32B088E3ADEC0F67FB319 /* DreamDictionaryView.swift in Sources */,
+				7E879F655D09BD05241D9663 /* DreamHomeView.swift in Sources */,
+				0E98D9C2A42363B606E56115 /* DreamInterpretationView.swift in Sources */,
+				275493F4B225F3985B883BCD /* DreamInterpreterViewModel.swift in Sources */,
+				3A10A610C9B7955D3D9AAFB0 /* DreamModels.swift in Sources */,
+				51F07E59A250DDF5EF8EE5E1 /* DreamOracleApp.swift in Sources */,
+				ECCCDBC70E8D52FFF85C788F /* DreamProfileView.swift in Sources */,
+				1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */,
+				6A16D4CD3EE6E4B853FFD3C1 /* GeminiImageService.swift in Sources */,
+				445F83930DEE9F12C6E9930A /* OpenAIService.swift in Sources */,
+				9BE8BD5495EAB744F36F19C6 /* OwnerSecrets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		81D69D1241F71E7510294CDB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A3ED1803D791E5018921DAFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GEMINI_API_KEY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RuyaYorum;
+				INFOPLIST_KEY_GEMINI_API_KEY = "$(GEMINI_API_KEY)";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Ruya anlatimini kaydetmek icin mikrofona ihtiyac var.";
+				INFOPLIST_KEY_OPENAI_API_KEY = "$(OPENAI_API_KEY)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OPENAI_API_KEY = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.deniz.dreamoracle;
+				PRODUCT_NAME = DreamOracle;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B7FD299549046B2F439A2A38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GEMINI_API_KEY = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RuyaYorum;
+				INFOPLIST_KEY_GEMINI_API_KEY = "$(GEMINI_API_KEY)";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Ruya anlatimini kaydetmek icin mikrofona ihtiyac var.";
+				INFOPLIST_KEY_OPENAI_API_KEY = "$(OPENAI_API_KEY)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OPENAI_API_KEY = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.deniz.dreamoracle;
+				PRODUCT_NAME = DreamOracle;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D5FA0ACB397436F9C1050FB9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4D87DF01EDD825A75A2BBE52 /* Build configuration list for PBXNativeTarget "DreamOracle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7FD299549046B2F439A2A38 /* Debug */,
+				A3ED1803D791E5018921DAFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FCA7519E17C82EDA1160FF85 /* Build configuration list for PBXProject "DreamOracle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5FA0ACB397436F9C1050FB9 /* Debug */,
+				81D69D1241F71E7510294CDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 847AE13DF0D724662C8AD3E1 /* Project object */;
+}

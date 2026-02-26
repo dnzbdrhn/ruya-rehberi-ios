@@ -1,0 +1,183 @@
+import SwiftUI
+
+enum DreamTheme {
+    static let skyTop = Color(red: 0.10, green: 0.15, blue: 0.37)
+    static let skyMiddle = Color(red: 0.20, green: 0.22, blue: 0.50)
+    static let skyBottom = Color(red: 0.35, green: 0.26, blue: 0.49)
+
+    static let cardDark = Color(red: 0.19, green: 0.21, blue: 0.42).opacity(0.90)
+    static let cardMid = Color(red: 0.28, green: 0.30, blue: 0.52).opacity(0.82)
+    static let cardLight = Color.white.opacity(0.90)
+
+    static let goldStart = Color(red: 0.96, green: 0.84, blue: 0.58)
+    static let goldEnd = Color(red: 0.83, green: 0.68, blue: 0.40)
+
+    static let textPrimary = Color.white
+    static let textMuted = Color.white.opacity(0.84)
+    static let textDark = Color(red: 0.15, green: 0.16, blue: 0.25)
+
+    static func heading(_ size: CGFloat) -> Font {
+        .custom("AvenirNext-Bold", size: size)
+    }
+
+    static func body(_ size: CGFloat) -> Font {
+        .custom("AvenirNext-Regular", size: size)
+    }
+
+    static func medium(_ size: CGFloat) -> Font {
+        .custom("AvenirNext-DemiBold", size: size)
+    }
+}
+
+enum DreamLayout {
+    static let screenHorizontal: CGFloat = 18
+    static let screenTop: CGFloat = 14
+    static let sectionSpacing: CGFloat = 14
+    static let screenBottom: CGFloat = 30
+}
+
+struct DreamBackground: View {
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                LinearGradient(
+                    colors: [DreamTheme.skyTop, DreamTheme.skyMiddle, DreamTheme.skyBottom],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+
+                RadialGradient(
+                    colors: [Color.white.opacity(0.14), Color.clear],
+                    center: .topTrailing,
+                    startRadius: 0,
+                    endRadius: proxy.size.width * 0.82
+                )
+                .ignoresSafeArea()
+
+                ForEach(0..<28, id: \.self) { index in
+                    Image(systemName: index.isMultiple(of: 3) ? "sparkles" : "circle.fill")
+                        .font(.system(size: CGFloat(index.isMultiple(of: 3) ? 8 : ((index % 2) + 2))))
+                        .foregroundStyle(Color.white.opacity(index.isMultiple(of: 3) ? 0.62 : 0.5))
+                        .position(starPoint(index: index, in: proxy.size))
+                }
+
+                CloudShapes()
+                    .fill(Color.white.opacity(0.11))
+                    .frame(width: proxy.size.width * 1.30, height: proxy.size.height * 0.47)
+                    .offset(y: proxy.size.height * 0.34)
+
+                CloudShapes()
+                    .fill(Color.white.opacity(0.06))
+                    .frame(width: proxy.size.width * 1.35, height: proxy.size.height * 0.52)
+                    .offset(y: proxy.size.height * 0.22)
+            }
+        }
+    }
+
+    private func starPoint(index: Int, in size: CGSize) -> CGPoint {
+        let xTable: [CGFloat] = [0.04, 0.11, 0.20, 0.31, 0.43, 0.57, 0.66, 0.74, 0.82, 0.92, 0.26, 0.49]
+        let yTable: [CGFloat] = [0.03, 0.06, 0.09, 0.14, 0.18, 0.22, 0.27, 0.12, 0.16, 0.21, 0.29, 0.08]
+        let x = xTable[index % xTable.count] * size.width
+        let y = yTable[index % yTable.count] * size.height
+        return CGPoint(x: x, y: y)
+    }
+}
+
+struct CloudShapes: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: rect.height * 0.72))
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.2, y: rect.height * 0.55),
+            control1: CGPoint(x: rect.width * 0.05, y: rect.height * 0.55),
+            control2: CGPoint(x: rect.width * 0.12, y: rect.height * 0.45)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.42, y: rect.height * 0.57),
+            control1: CGPoint(x: rect.width * 0.24, y: rect.height * 0.42),
+            control2: CGPoint(x: rect.width * 0.35, y: rect.height * 0.43)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.6, y: rect.height * 0.48),
+            control1: CGPoint(x: rect.width * 0.46, y: rect.height * 0.41),
+            control2: CGPoint(x: rect.width * 0.55, y: rect.height * 0.40)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width * 0.83, y: rect.height * 0.58),
+            control1: CGPoint(x: rect.width * 0.67, y: rect.height * 0.36),
+            control2: CGPoint(x: rect.width * 0.77, y: rect.height * 0.45)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.width, y: rect.height * 0.72),
+            control1: CGPoint(x: rect.width * 0.90, y: rect.height * 0.65),
+            control2: CGPoint(x: rect.width * 0.97, y: rect.height * 0.67)
+        )
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: rect.height))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct DreamCardModifier: ViewModifier {
+    var light: Bool = false
+    var cornerRadius: CGFloat = 22
+
+    func body(content: Content) -> some View {
+        content
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(light ? DreamTheme.cardLight : DreamTheme.cardDark)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .stroke(Color.white.opacity(light ? 0.20 : 0.18), lineWidth: 1)
+                    )
+            )
+            .shadow(color: .black.opacity(0.22), radius: 14, y: 6)
+    }
+}
+
+struct DreamGoldButtonModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(DreamTheme.medium(17))
+            .foregroundStyle(DreamTheme.textDark)
+            .padding(.vertical, 13)
+            .frame(maxWidth: .infinity)
+            .background(
+                LinearGradient(
+                    colors: [DreamTheme.goldStart, DreamTheme.goldEnd],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.24), lineWidth: 0.8)
+            )
+    }
+}
+
+extension View {
+    func dreamCard(light: Bool = false, cornerRadius: CGFloat = 22) -> some View {
+        modifier(DreamCardModifier(light: light, cornerRadius: cornerRadius))
+    }
+
+    func dreamGoldButton() -> some View {
+        modifier(DreamGoldButtonModifier())
+    }
+}
+
+private struct UsesSharedTabPanoramaBackgroundKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var usesSharedTabPanoramaBackground: Bool {
+        get { self[UsesSharedTabPanoramaBackgroundKey.self] }
+        set { self[UsesSharedTabPanoramaBackgroundKey.self] = newValue }
+    }
+}
