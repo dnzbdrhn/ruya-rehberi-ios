@@ -1,10 +1,22 @@
 import SwiftUI
 
-private enum DreamJournalTopTab: String, CaseIterable, Identifiable {
-    case dreams = "Rüyalar"
-    case objects = "Rüya Nesneleri"
+private enum DreamJournalTopTab: CaseIterable, Identifiable {
+    case dreams
+    case objects
 
-    var id: String { rawValue }
+    var id: String {
+        switch self {
+        case .dreams: return "dreams"
+        case .objects: return "objects"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .dreams: return String(localized: "journal.top_tab.dreams")
+        case .objects: return String(localized: "journal.top_tab.objects")
+        }
+    }
 }
 
 private enum DreamObjectCategory: CaseIterable, Identifiable {
@@ -17,31 +29,42 @@ private enum DreamObjectCategory: CaseIterable, Identifiable {
     case themes
     case weather
 
-    var id: String { title }
+    var id: String {
+        switch self {
+        case .people: return "people"
+        case .actions: return "actions"
+        case .places: return "places"
+        case .emotions: return "emotions"
+        case .animals: return "animals"
+        case .objects: return "objects"
+        case .themes: return "themes"
+        case .weather: return "weather"
+        }
+    }
 
     var title: String {
         switch self {
-        case .people: return "İnsanlar"
-        case .actions: return "Eylemler"
-        case .places: return "Yerler"
-        case .emotions: return "Duygular"
-        case .animals: return "Hayvanlar"
-        case .objects: return "Nesneler"
-        case .themes: return "Temalar"
-        case .weather: return "Hava Durumu"
+        case .people: return String(localized: "journal.category.people.title")
+        case .actions: return String(localized: "journal.category.actions.title")
+        case .places: return String(localized: "journal.category.places.title")
+        case .emotions: return String(localized: "journal.category.emotions.title")
+        case .animals: return String(localized: "journal.category.animals.title")
+        case .objects: return String(localized: "journal.category.objects.title")
+        case .themes: return String(localized: "journal.category.themes.title")
+        case .weather: return String(localized: "journal.category.weather.title")
         }
     }
 
     var subtitle: String {
         switch self {
-        case .people: return "Rüyalardaki kişiler ve figürler"
-        case .actions: return "Tekrarlayan davranış ve hareketler"
-        case .places: return "Mekanlar ve sahneler"
-        case .emotions: return "Duygusal ipuçları"
-        case .animals: return "Hayvan arketipleri"
-        case .objects: return "Sembolik nesneler"
-        case .themes: return "Ana tematik örüntüler"
-        case .weather: return "Atmosfer ve hava halleri"
+        case .people: return String(localized: "journal.category.people.subtitle")
+        case .actions: return String(localized: "journal.category.actions.subtitle")
+        case .places: return String(localized: "journal.category.places.subtitle")
+        case .emotions: return String(localized: "journal.category.emotions.subtitle")
+        case .animals: return String(localized: "journal.category.animals.subtitle")
+        case .objects: return String(localized: "journal.category.objects.subtitle")
+        case .themes: return String(localized: "journal.category.themes.subtitle")
+        case .weather: return String(localized: "journal.category.weather.subtitle")
         }
     }
 
@@ -256,8 +279,7 @@ struct DreamJournalHubView: View {
 
     private var calendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.locale = Locale(identifier: "tr_TR")
-        cal.firstWeekday = 2
+        cal.locale = .autoupdatingCurrent
         return cal
     }
 
@@ -282,9 +304,17 @@ struct DreamJournalHubView: View {
     private var countBadgeText: String {
         let query = normalized(searchText)
         if activeTab == .dreams, !query.isEmpty {
-            return "\(visibleDreams.count) sonuç"
+            return String(
+                format: String(localized: "journal.count.results_format"),
+                locale: .autoupdatingCurrent,
+                visibleDreams.count
+            )
         }
-        return "\(orderedDreams.count) kayıt"
+        return String(
+            format: String(localized: "journal.count.records_format"),
+            locale: .autoupdatingCurrent,
+            orderedDreams.count
+        )
     }
 
     private var categoryBuckets: [DreamObjectCategory: [String: Int]] {
@@ -339,7 +369,7 @@ struct DreamJournalHubView: View {
 
     private var header: some View {
         HStack {
-            Text("Rüyalarım")
+            Text(String(localized: "journal.title"))
                 .font(DreamTheme.heading(34))
                 .foregroundStyle(Color.white)
 
@@ -358,24 +388,13 @@ struct DreamJournalHubView: View {
     private var topTabs: some View {
         HStack(spacing: 8) {
             ForEach(DreamJournalTopTab.allCases) { tab in
+                let isActive = activeTab == tab
                 Button {
                     withAnimation(.easeInOut(duration: 0.18)) {
                         activeTab = tab
                     }
                 } label: {
-                    Text(tab.rawValue)
-                        .font(DreamTheme.medium(16))
-                        .foregroundStyle(activeTab == tab ? DreamTheme.textDark : Color.white.opacity(0.84))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(activeTab == tab ? Color.white.opacity(0.90) : Color.black.opacity(0.20))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .stroke(activeTab == tab ? DreamTheme.goldEnd.opacity(0.55) : Color.white.opacity(0.12), lineWidth: 1)
-                        )
+                    topTabLabel(tab: tab, isActive: isActive)
                 }
                 .buttonStyle(.plain)
             }
@@ -385,13 +404,35 @@ struct DreamJournalHubView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
+    private func topTabLabel(tab: DreamJournalTopTab, isActive: Bool) -> some View {
+        let textColor = isActive ? DreamTheme.textDark : Color.white.opacity(0.84)
+        let fillColor = isActive ? Color.white.opacity(0.90) : Color.black.opacity(0.20)
+        let borderColor = isActive ? DreamTheme.goldEnd.opacity(0.55) : Color.white.opacity(0.12)
+
+        return Text(tab.title)
+            .font(DreamTheme.medium(16))
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
+            .foregroundStyle(textColor)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(fillColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(borderColor, lineWidth: 1)
+            )
+    }
+
     private var dreamsSection: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                filterPill(title: "Tümü", isActive: !showFavoritesOnly) {
+                filterPill(title: String(localized: "common.all"), isActive: !showFavoritesOnly) {
                     showFavoritesOnly = false
                 }
-                filterPill(title: "Favoriler", isActive: showFavoritesOnly) {
+                filterPill(title: String(localized: "common.favorites"), isActive: showFavoritesOnly) {
                     showFavoritesOnly = true
                 }
 
@@ -412,7 +453,7 @@ struct DreamJournalHubView: View {
                     HStack(spacing: 6) {
                         Image(systemName: isSearchExpanded ? "xmark.circle.fill" : "magnifyingglass")
                             .font(.system(size: 13, weight: .semibold))
-                        Text(isSearchExpanded ? "Kapat" : "Ara")
+                        Text(isSearchExpanded ? String(localized: "common.close") : String(localized: "common.search"))
                             .font(DreamTheme.medium(13.5))
                     }
                     .foregroundStyle(Color.white.opacity(0.90))
@@ -529,11 +570,11 @@ struct DreamJournalHubView: View {
     private var objectsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Rüya Nesneleri")
+                Text(String(localized: "journal.objects.title"))
                     .font(DreamTheme.heading(33 * 0.86))
                     .foregroundStyle(Color.white)
 
-                Text("Rüyalarındaki kişi, mekan, tema ve sembolleri keşfet")
+                Text(String(localized: "journal.objects.subtitle"))
                     .font(DreamTheme.body(16))
                     .foregroundStyle(Color.white.opacity(0.78))
             }
@@ -571,7 +612,13 @@ struct DreamJournalHubView: View {
                 Text(category.title)
                     .font(DreamTheme.medium(22 * 0.88))
                     .foregroundStyle(Color.white)
-                Text("\(total) varlık")
+                Text(
+                    String(
+                        format: String(localized: "journal.objects.count_format"),
+                        locale: .autoupdatingCurrent,
+                        total
+                    )
+                )
                     .font(DreamTheme.body(16))
                     .foregroundStyle(Color.white.opacity(0.70))
             }
@@ -616,7 +663,7 @@ struct DreamJournalHubView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.white.opacity(0.72))
 
-            TextField("Rüya ara (başlık, içerik, tarih)", text: $searchText)
+            TextField(String(localized: "journal.search.placeholder"), text: $searchText)
                 .font(DreamTheme.body(14))
                 .foregroundStyle(Color.white.opacity(0.92))
                 .textInputAutocapitalization(.never)
@@ -654,16 +701,16 @@ struct DreamJournalHubView: View {
 
     private var emptyDreamStateTitle: String {
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Aramaya uygun rüya bulunamadı"
+            return String(localized: "journal.empty.search_title")
         }
-        return showFavoritesOnly ? "Henüz favori rüya yok" : "Henüz kayıtlı rüya yok"
+        return showFavoritesOnly ? String(localized: "journal.empty.favorites_title") : String(localized: "journal.empty.none_title")
     }
 
     private var emptyDreamStateSubtitle: String {
         if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Başlık, içerik veya tarih için farklı bir kelime dene."
+            return String(localized: "journal.empty.search_subtitle")
         }
-        return "Yeni rüya kaydettikçe burada en güncelden eskiye sıralanacak."
+        return String(localized: "journal.empty.default_subtitle")
     }
 
     @ViewBuilder
@@ -775,12 +822,12 @@ struct DreamJournalHubView: View {
 
     private func moodDistribution(records: [DreamRecord]) -> [DreamMoodShare] {
         let mappings: [(title: String, emoji: String, matcher: (String) -> Bool)] = [
-            ("Huzurlu", "😌", { text in text.contains("huzurlu") }),
-            ("Harika", "😍", { text in text.contains("harika") }),
-            ("Nötr", "😐", { text in text.contains("notr") || text.contains("nötr") }),
-            ("Kafası Karışık", "🤔", { text in text.contains("kafasi") || text.contains("kafası") }),
-            ("Kaygılı", "😰", { text in text.contains("kaygili") || text.contains("kaygılı") }),
-            ("Korkunç", "😱", { text in text.contains("korkunc") || text.contains("korkunç") })
+            (String(localized: "mood.peaceful"), "😌", { text in text.contains("huzurlu") }),
+            (String(localized: "mood.great"), "😍", { text in text.contains("harika") }),
+            (String(localized: "mood.neutral"), "😐", { text in text.contains("notr") || text.contains("nötr") }),
+            (String(localized: "mood.confused"), "🤔", { text in text.contains("kafasi") || text.contains("kafası") }),
+            (String(localized: "mood.anxious"), "😰", { text in text.contains("kaygili") || text.contains("kaygılı") }),
+            (String(localized: "mood.scary"), "😱", { text in text.contains("korkunc") || text.contains("korkunç") })
         ]
 
         return mappings.map { item in
@@ -808,36 +855,36 @@ struct DreamJournalHubView: View {
 
     private static let cardDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "dd.MM.yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("dd.MM.yyyy")
         return formatter
     }()
 
     private static let cardSlashDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy")
         return formatter
     }()
 
     private static let cardLongDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "d MMMM yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("d MMMM yyyy")
         return formatter
     }()
 
     private static let cardWeekdayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "EEEE d MMMM yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("EEEE d MMMM yyyy")
         return formatter
     }()
 
     private static let monthShortFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "LLL"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("LLL")
         return formatter
     }()
 }
@@ -872,7 +919,13 @@ private struct DreamObjectAnalysisView: View {
                         .frame(width: 56, height: 56)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(category.title) Analizleri")
+                            Text(
+                                String(
+                                    format: String(localized: "journal.analysis.title_format"),
+                                    locale: .autoupdatingCurrent,
+                                    category.title
+                                )
+                            )
                                 .font(DreamTheme.heading(34 * 0.86))
                                 .foregroundStyle(Color.white)
                             Text(category.subtitle)
@@ -882,8 +935,8 @@ private struct DreamObjectAnalysisView: View {
                     }
 
                     DreamAnalyticsCard(
-                        title: "Kategori Eğilimleri",
-                        subtitle: "Son 6 aydaki görülme sıklığı",
+                        title: String(localized: "journal.analysis.trends.title"),
+                        subtitle: String(localized: "journal.analysis.trends.subtitle"),
                         icon: "chart.line.uptrend.xyaxis",
                         accent: category.accent
                     ) {
@@ -891,8 +944,8 @@ private struct DreamObjectAnalysisView: View {
                     }
 
                     DreamAnalyticsCard(
-                        title: "Ruh Hali Dağılımı",
-                        subtitle: "Bu kategorideki rüyalarda duygusal profil",
+                        title: String(localized: "journal.analysis.mood_dist.title"),
+                        subtitle: String(localized: "journal.analysis.mood_dist.subtitle"),
                         icon: "face.smiling",
                         accent: category.accent
                     ) {
@@ -900,8 +953,8 @@ private struct DreamObjectAnalysisView: View {
                     }
 
                     DreamAnalyticsCard(
-                        title: "Nitelik Örüntüleri",
-                        subtitle: "En sık geçen varlıklar",
+                        title: String(localized: "journal.analysis.entities.title"),
+                        subtitle: String(localized: "journal.analysis.entities.subtitle"),
                         icon: "circle.hexagongrid",
                         accent: category.accent
                     ) {
@@ -1073,7 +1126,7 @@ private struct DreamEntityTagView: View {
 
     var body: some View {
         if entities.isEmpty {
-            Text("Bu kategoride henüz belirgin varlık bulunamadı.")
+            Text(String(localized: "journal.analysis.entities.empty"))
                 .font(DreamTheme.body(14.5))
                 .foregroundStyle(Color.white.opacity(0.68))
                 .frame(maxWidth: .infinity, alignment: .leading)

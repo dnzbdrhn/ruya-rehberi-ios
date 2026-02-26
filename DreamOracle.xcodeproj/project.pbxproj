@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1F9C3F12C8A4D1200AA1001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1F9C3F02C8A4D1200AA1001 /* Localizable.strings */; };
 		0E98D9C2A42363B606E56115 /* DreamInterpretationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */; };
 		1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769850A7924593ADFD99B0BD /* DreamTheme.swift */; };
 		22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */ = {isa = PBXBuildFile; fileRef = F80B1DA8D1973537461737E9 /* arkaplan_new.png */; };
@@ -47,12 +48,15 @@
 		E30164EF9C5927C78D998E04 /* DreamDictionaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDictionaryView.swift; sourceTree = "<group>"; };
 		EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamInterpreterViewModel.swift; sourceTree = "<group>"; };
 		F80B1DA8D1973537461737E9 /* arkaplan_new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arkaplan_new.png; sourceTree = "<group>"; };
+		A1F9C3F22C8A4D1200AA1001 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1F9C3F32C8A4D1200AA1001 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		3E103F93EB6675D539D79374 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A1F9C3F02C8A4D1200AA1001 /* Localizable.strings */,
 				F80B1DA8D1973537461737E9 /* arkaplan_new.png */,
 				6D99036A1666A6D00E90C6DA /* arkaplan.png */,
 			);
@@ -103,6 +107,18 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXVariantGroup section */
+		A1F9C3F02C8A4D1200AA1001 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1F9C3F22C8A4D1200AA1001 /* en */,
+				A1F9C3F32C8A4D1200AA1001 /* tr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin PBXNativeTarget section */
 		A1A70925EED5DEBE4BD8DE4A /* DreamOracle */ = {
 			isa = PBXNativeTarget;
@@ -143,6 +159,7 @@
 			knownRegions = (
 				Base,
 				en,
+				tr,
 			);
 			mainGroup = 45E68203ECBDF0CCC293CE5B;
 			minimizedProjectReferenceProxies = 1;
@@ -160,6 +177,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1F9C3F12C8A4D1200AA1001 /* Localizable.strings in Resources */,
 				44DD0D38B447FE26D133D24C /* arkaplan.png in Resources */,
 				22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */,
 			);

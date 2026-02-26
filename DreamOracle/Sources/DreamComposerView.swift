@@ -21,7 +21,15 @@ struct DreamComposerView: View {
     @FocusState private var isFragmentsFocused: Bool
 
     private let moodEmojis = ["😌", "😍", "😐", "🤔", "😰", "😱"]
-    private let moodTitles = ["Huzurlu", "Harika", "Nötr", "Kafası Karışık", "Kaygılı", "Korkunç"]
+    private let moodValues = ["Huzurlu", "Harika", "Nötr", "Kafası Karışık", "Kaygılı", "Korkunç"]
+    private let moodTitleKeys = [
+        "composer.mood.peaceful",
+        "composer.mood.great",
+        "composer.mood.neutral",
+        "composer.mood.confused",
+        "composer.mood.anxious",
+        "composer.mood.scary"
+    ]
 
     init(
         viewModel: DreamInterpreterViewModel,
@@ -64,11 +72,15 @@ struct DreamComposerView: View {
 
     private var selectedMoodIndex: Int {
         let index = Int(moodSliderValue.rounded())
-        return min(max(index, 0), moodTitles.count - 1)
+        return min(max(index, 0), moodValues.count - 1)
     }
 
     private var selectedMoodTitle: String {
-        moodTitles[selectedMoodIndex]
+        String(localized: String.LocalizationValue(moodTitleKeys[selectedMoodIndex]))
+    }
+
+    private var selectedMoodValue: String {
+        moodValues[selectedMoodIndex]
     }
 
     private var topBar: some View {
@@ -84,7 +96,7 @@ struct DreamComposerView: View {
                     .foregroundStyle(Color.white.opacity(0.95))
             }
 
-            Text("Yeni Rüya")
+            Text(String(localized: "composer.title"))
                 .font(DreamTheme.heading(35 * 0.83))
                 .foregroundStyle(Color.white)
                 .padding(.leading, 8)
@@ -97,7 +109,7 @@ struct DreamComposerView: View {
         VStack(alignment: .leading, spacing: 7) {
             ZStack(alignment: .topLeading) {
                 if detailText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text("Rüyanızı anlatın...")
+                    Text(String(localized: "composer.detail.placeholder"))
                         .font(DreamTheme.body(18))
                         .foregroundStyle(Color.white.opacity(0.36))
                         .padding(.top, 16)
@@ -193,10 +205,10 @@ struct DreamComposerView: View {
                 .frame(width: 40, height: 40)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Rüya Yardımcısı")
+                    Text(String(localized: "composer.rebuilder.title"))
                         .font(DreamTheme.medium(19))
                         .foregroundStyle(Color.white)
-                    Text("Anahtar kelimeleri detaylı rüyalara dönüştürün")
+                    Text(String(localized: "composer.rebuilder.subtitle"))
                         .font(DreamTheme.body(14))
                         .foregroundStyle(Color.white.opacity(0.68))
                 }
@@ -206,14 +218,20 @@ struct DreamComposerView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("ANAHTAR KELIMELER VE PARÇALAR")
+                    Text(String(localized: "composer.rebuilder.fragments_header"))
                         .font(DreamTheme.medium(14))
                         .kerning(1)
                         .foregroundStyle(Color.white.opacity(0.75))
 
                     Spacer()
 
-                    Text("\(max(viewModel.freeRemaining, 0)) KALDI")
+                    Text(
+                        String(
+                            format: String(localized: "composer.rebuilder.remaining_format"),
+                            locale: .autoupdatingCurrent,
+                            max(viewModel.freeRemaining, 0)
+                        )
+                    )
                         .font(DreamTheme.medium(13))
                         .foregroundStyle(Color(red: 0.67, green: 0.46, blue: 0.97))
                         .padding(.horizontal, 11)
@@ -224,7 +242,7 @@ struct DreamComposerView: View {
 
                 ZStack(alignment: .topLeading) {
                     if fragmentsText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text("Uçmak, okyanus, çocukluk evi, tanıdık bir ses...")
+                        Text(String(localized: "composer.rebuilder.placeholder"))
                             .font(DreamTheme.body(16))
                             .foregroundStyle(Color.white.opacity(0.36))
                             .padding(.top, 14)
@@ -257,7 +275,9 @@ struct DreamComposerView: View {
                         } else {
                             Image(systemName: "sparkles")
                         }
-                        Text("Rüya Yardımını Uygula")
+                        Text(String(localized: "composer.rebuilder.apply"))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.center)
                     }
                     .dreamGoldButton()
                 }
@@ -280,7 +300,7 @@ struct DreamComposerView: View {
     private var controlPanels: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Rüya Netliği")
+                Text(String(localized: "composer.clarity"))
                     .font(DreamTheme.medium(16))
                     .foregroundStyle(Color.white)
 
@@ -301,7 +321,7 @@ struct DreamComposerView: View {
             .dreamCard(light: false, cornerRadius: 16)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Duygu Durumu")
+                Text(String(localized: "composer.mood"))
                     .font(DreamTheme.medium(16))
                     .foregroundStyle(Color.white)
 
@@ -314,7 +334,7 @@ struct DreamComposerView: View {
                     }
                 }
 
-                Slider(value: $moodSliderValue, in: 0...Double(moodTitles.count - 1), step: 1)
+                Slider(value: $moodSliderValue, in: 0...Double(moodValues.count - 1), step: 1)
                     .tint(Color.white)
 
                 Text(selectedMoodTitle)
@@ -334,7 +354,7 @@ struct DreamComposerView: View {
                     ProgressView()
                         .tint(DreamTheme.textDark)
                 }
-                Text("Kaydet")
+                Text(String(localized: "composer.save"))
             }
             .dreamGoldButton()
         }
@@ -379,7 +399,7 @@ struct DreamComposerView: View {
         guard !trimmed.isEmpty else { return }
 
         Task {
-            if let rebuilt = await viewModel.rebuildDreamFromFragments(trimmed, mood: selectedMoodTitle) {
+            if let rebuilt = await viewModel.rebuildDreamFromFragments(trimmed, mood: selectedMoodValue) {
                 detailText = rebuilt
                 usedVoiceInput = false
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -401,7 +421,7 @@ struct DreamComposerView: View {
                 detailText: detail,
                 symbols: [],
                 clarity: (claritySun + clarityMoon) / 2,
-                mood: selectedMoodTitle,
+                mood: selectedMoodValue,
                 source: source
             )
 

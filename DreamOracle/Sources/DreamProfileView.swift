@@ -27,7 +27,7 @@ struct DreamProfileView: View {
 
     private var topBar: some View {
         HStack {
-            Text("Profil")
+            Text(String(localized: "profile.title"))
                 .font(DreamTheme.heading(34))
                 .foregroundStyle(Color.white)
             Spacer()
@@ -39,13 +39,13 @@ struct DreamProfileView: View {
 
     private var walletCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Kredi Cüzdanı")
+            Text(String(localized: "profile.wallet"))
                 .font(DreamTheme.medium(23))
                 .foregroundStyle(Color.white)
 
             HStack(spacing: 12) {
-                statTile(title: "Ucretsiz Hak", value: "\(viewModel.freeRemaining)/2")
-                statTile(title: "Kredi", value: "\(viewModel.credits)")
+                statTile(title: String(localized: "profile.stat.free"), value: "\(viewModel.freeRemaining)/2")
+                statTile(title: String(localized: "profile.stat.credit"), value: "\(viewModel.credits)")
             }
         }
         .dreamCard(light: false, cornerRadius: 22)
@@ -53,14 +53,14 @@ struct DreamProfileView: View {
 
     private var statsCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("İstatistik")
+            Text(String(localized: "profile.stats"))
                 .font(DreamTheme.medium(23))
                 .foregroundStyle(Color.white)
 
             HStack(spacing: 12) {
-                statTile(title: "Toplam Ruya", value: "\(viewModel.dreamRecords.count)")
+                statTile(title: String(localized: "profile.stat.total_dreams"), value: "\(viewModel.dreamRecords.count)")
                 statTile(
-                    title: "Ucretli Soru",
+                    title: String(localized: "profile.stat.paid_questions"),
                     value: "\(viewModel.dreamRecords.reduce(0) { $0 + $1.followUps.count })"
                 )
             }
@@ -70,22 +70,22 @@ struct DreamProfileView: View {
 
     private var creditsCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Kredi Satın Al")
+            Text(String(localized: "profile.buy_credits"))
                 .font(DreamTheme.medium(23))
                 .foregroundStyle(Color.white)
 
-            Button("+5 Kredi") {
+            Button(String(localized: "profile.pack.5")) {
                 viewModel.purchaseCredits(5)
             }
             .dreamGoldButton()
 
             HStack(spacing: 10) {
-                Button("+15 Kredi") {
+                Button(String(localized: "profile.pack.15")) {
                     viewModel.purchaseCredits(15)
                 }
                 .dreamGoldButton()
 
-                Button("+40 Kredi") {
+                Button(String(localized: "profile.pack.40")) {
                     viewModel.purchaseCredits(40)
                 }
                 .dreamGoldButton()
@@ -96,10 +96,10 @@ struct DreamProfileView: View {
 
     private var noteCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Bilgi")
+            Text(String(localized: "profile.info"))
                 .font(DreamTheme.medium(20))
                 .foregroundStyle(Color.white)
-            Text("İlk 2 rüya yorumu ücretsizdir. Sonraki her yorum ve her takip sorusu 1 kredi kullanır.")
+            Text(String(localized: "profile.note.pricing"))
                 .font(DreamTheme.body(16))
                 .foregroundStyle(Color.white.opacity(0.86))
         }

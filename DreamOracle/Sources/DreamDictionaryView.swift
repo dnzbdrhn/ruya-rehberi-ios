@@ -2,7 +2,7 @@ import SwiftUI
 
 private struct DictionaryEntry: Identifiable, Hashable {
     let id = UUID()
-    let name: String
+    let nameKey: String
     let icon: String
     let letter: String
 }
@@ -23,20 +23,21 @@ struct DreamDictionaryView: View {
     @State private var searchText = ""
     @State private var mode: DictionaryMode = .symbol
     @State private var recentMode: RecentMode = .recent
-    @State private var favorites: Set<String> = ["Deniz", "Balık"]
-    @State private var recentNames: [String] = ["Ay", "Balık"]
+    @State private var favorites: Set<String> = ["dictionary.entry.sea", "dictionary.entry.fish"]
+    @State private var recentNames: [String] = ["dictionary.entry.moon", "dictionary.entry.fish"]
 
     private let entries: [DictionaryEntry] = [
-        .init(name: "Anahtar", icon: "key.fill", letter: "A"),
-        .init(name: "Ayakkabı", icon: "shoe.2.fill", letter: "A"),
-        .init(name: "Balık", icon: "fish.fill", letter: "B"),
-        .init(name: "Deniz", icon: "water.waves", letter: "D"),
-        .init(name: "Fil", icon: "tortoise.fill", letter: "F"),
-        .init(name: "Gölge", icon: "moon.fill", letter: "G"),
-        .init(name: "Kapı", icon: "door.left.hand.open", letter: "K"),
-        .init(name: "Kuş", icon: "bird.fill", letter: "K"),
-        .init(name: "Merdiven", icon: "stairs", letter: "M"),
-        .init(name: "Yıldız", icon: "sparkles", letter: "Y")
+        .init(nameKey: "dictionary.entry.key", icon: "key.fill", letter: "A"),
+        .init(nameKey: "dictionary.entry.shoe", icon: "shoe.2.fill", letter: "A"),
+        .init(nameKey: "dictionary.entry.fish", icon: "fish.fill", letter: "B"),
+        .init(nameKey: "dictionary.entry.sea", icon: "water.waves", letter: "D"),
+        .init(nameKey: "dictionary.entry.elephant", icon: "tortoise.fill", letter: "F"),
+        .init(nameKey: "dictionary.entry.shadow", icon: "moon.fill", letter: "G"),
+        .init(nameKey: "dictionary.entry.door", icon: "door.left.hand.open", letter: "K"),
+        .init(nameKey: "dictionary.entry.bird", icon: "bird.fill", letter: "K"),
+        .init(nameKey: "dictionary.entry.stairs", icon: "stairs", letter: "M"),
+        .init(nameKey: "dictionary.entry.star", icon: "sparkles", letter: "Y"),
+        .init(nameKey: "dictionary.entry.moon", icon: "moon.stars.fill", letter: "A")
     ]
 
     init(onOpenInterpretation: ((UUID) -> Void)? = nil) {
@@ -71,7 +72,7 @@ struct DreamDictionaryView: View {
 
             Spacer()
 
-            Text("Rüya Sözlüğü")
+            Text(String(localized: "dictionary.title"))
                 .font(DreamTheme.heading(34 * 0.82))
                 .foregroundStyle(Color.white)
 
@@ -84,7 +85,7 @@ struct DreamDictionaryView: View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(Color.white.opacity(0.6))
-            TextField("Sembol Ara...", text: $searchText)
+            TextField(String(localized: "dictionary.search.placeholder"), text: $searchText)
                 .font(DreamTheme.body(18))
                 .foregroundStyle(Color.white.opacity(0.9))
                 .textInputAutocapitalization(.never)
@@ -102,10 +103,10 @@ struct DreamDictionaryView: View {
 
     private var topSegment: some View {
         HStack(spacing: 8) {
-            segmentButton(title: "Sembol", isActive: mode == .symbol) {
+            segmentButton(title: String(localized: "dictionary.segment.symbol"), isActive: mode == .symbol) {
                 mode = .symbol
             }
-            segmentButton(title: "Favoriler", isActive: mode == .favorite) {
+            segmentButton(title: String(localized: "dictionary.segment.favorites"), isActive: mode == .favorite) {
                 mode = .favorite
             }
         }
@@ -120,11 +121,11 @@ struct DreamDictionaryView: View {
                 ForEach(filteredEntries.indices, id: \.self) { index in
                     let entry = filteredEntries[index]
                     Button {
-                        toggleRecent(entry.name)
+                        toggleRecent(entry.nameKey)
                     } label: {
                         HStack(spacing: 12) {
                             iconBadge(for: entry.icon)
-                            Text(entry.name)
+                            Text(localizedEntryName(entry.nameKey))
                                 .font(DreamTheme.medium(19))
                                 .foregroundStyle(Color.white.opacity(0.97))
                             Spacer()
@@ -159,10 +160,10 @@ struct DreamDictionaryView: View {
 
     private var lowerSegment: some View {
         HStack(spacing: 8) {
-            segmentButton(title: "Favoriler", isActive: recentMode == .favorite) {
+            segmentButton(title: String(localized: "dictionary.segment.favorites"), isActive: recentMode == .favorite) {
                 recentMode = .favorite
             }
-            segmentButton(title: "Son Bakılanlar", isActive: recentMode == .recent) {
+            segmentButton(title: String(localized: "dictionary.segment.recent"), isActive: recentMode == .recent) {
                 recentMode = .recent
             }
         }
@@ -173,13 +174,13 @@ struct DreamDictionaryView: View {
 
     private var recentPanel: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Son Bakılanlar")
+            Text(String(localized: "dictionary.recent.title"))
                 .font(DreamTheme.medium(22))
                 .foregroundStyle(Color.white)
 
             HStack(spacing: 10) {
-                ForEach(recentVisible.prefix(4), id: \.self) { name in
-                    iconBadge(for: iconForName(name))
+                ForEach(recentVisible.prefix(4), id: \.self) { nameKey in
+                    iconBadge(for: iconForNameKey(nameKey))
                         .frame(width: 50, height: 50)
                 }
                 Spacer()
@@ -194,12 +195,12 @@ struct DreamDictionaryView: View {
         case .symbol:
             base = entries
         case .favorite:
-            base = entries.filter { favorites.contains($0.name) }
+            base = entries.filter { favorites.contains($0.nameKey) }
         }
 
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if trimmed.isEmpty { return base }
-        return base.filter { $0.name.lowercased().contains(trimmed) }
+        return base.filter { localizedEntryName($0.nameKey).lowercased().contains(trimmed) }
     }
 
     private var recentVisible: [String] {
@@ -217,6 +218,8 @@ struct DreamDictionaryView: View {
         Button(action: action) {
             Text(title)
                 .font(DreamTheme.medium(18))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .foregroundStyle(isActive ? DreamTheme.textDark : Color.white.opacity(0.83))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 9)
@@ -242,7 +245,11 @@ struct DreamDictionaryView: View {
         recentNames = Array(recentNames.prefix(8))
     }
 
-    private func iconForName(_ name: String) -> String {
-        entries.first(where: { $0.name == name })?.icon ?? "sparkles"
+    private func iconForNameKey(_ nameKey: String) -> String {
+        entries.first(where: { $0.nameKey == nameKey })?.icon ?? "sparkles"
+    }
+
+    private func localizedEntryName(_ key: String) -> String {
+        String(localized: String.LocalizationValue(key))
     }
 }

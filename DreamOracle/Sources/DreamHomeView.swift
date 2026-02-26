@@ -30,7 +30,7 @@ struct DreamHomeView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
-            Text("Rüya Rehberi")
+            Text(String(localized: "home.title"))
                 .font(DreamTheme.heading(39))
                 .foregroundStyle(DreamTheme.textPrimary)
             Spacer()
@@ -71,7 +71,7 @@ struct DreamHomeView: View {
                 onOpenComposer()
             } label: {
                 HStack(spacing: 10) {
-                    Text("Rüyanızı Paylaşın")
+                    Text(String(localized: "home.share"))
                         .font(DreamTheme.medium(19.5))
                         .foregroundStyle(DreamTheme.textDark)
                         .lineLimit(1)
@@ -108,11 +108,23 @@ struct DreamHomeView: View {
     private var historyPanel: some View {
         VStack(spacing: 0) {
             if viewModel.dreamRecords.isEmpty {
-                placeholderRow(title: "Uçan Fil", date: "18.05.2024", icon: "tortoise.fill")
+                placeholderRow(
+                    title: String(localized: "home.placeholder.1.title"),
+                    date: String(localized: "home.placeholder.1.date"),
+                    icon: "tortoise.fill"
+                )
                 divider
-                placeholderRow(title: "Rüyan Böğedi", date: "18.04.2024", icon: "moon.fill")
+                placeholderRow(
+                    title: String(localized: "home.placeholder.2.title"),
+                    date: String(localized: "home.placeholder.2.date"),
+                    icon: "moon.fill"
+                )
                 divider
-                placeholderRow(title: "Rüyan Rasun Talci", date: "16.04.2024", icon: "cloud.fill")
+                placeholderRow(
+                    title: String(localized: "home.placeholder.3.title"),
+                    date: String(localized: "home.placeholder.3.date"),
+                    icon: "cloud.fill"
+                )
             } else {
                 ForEach(Array(viewModel.dreamRecords.prefix(3).enumerated()), id: \.element.id) { index, record in
                     Button {
@@ -229,7 +241,7 @@ struct DreamHomeView: View {
     private var dailyAnalysisCard: some View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Günlük Analiz")
+                Text(String(localized: "home.daily_analysis"))
                     .font(DreamTheme.medium(20.5))
                     .foregroundStyle(Color.white)
 
@@ -261,7 +273,7 @@ struct DreamHomeView: View {
         if !viewModel.interpretation.isEmpty {
             return viewModel.interpretation
         }
-        return "Özgürlük arayışı, içsel denge ve sembolik bir yolculuk teması dikkat çekiyor."
+        return String(localized: "home.analysis_fallback")
     }
 
     @ViewBuilder
@@ -282,7 +294,8 @@ struct DreamHomeView: View {
 
     private static let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.dateStyle = .short
         return formatter
     }()
 }

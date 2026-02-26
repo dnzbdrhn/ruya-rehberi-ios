@@ -13,13 +13,13 @@ private enum DreamMoodFilter: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .all: return "Tümü"
-        case .peaceful: return "Huzurlu"
-        case .great: return "Harika"
-        case .neutral: return "Nötr"
-        case .confused: return "Kafası Karışık"
-        case .anxious: return "Kaygılı"
-        case .scary: return "Korkunç"
+        case .all: return String(localized: "calendar.filter.all")
+        case .peaceful: return String(localized: "calendar.filter.peaceful")
+        case .great: return String(localized: "calendar.filter.great")
+        case .neutral: return String(localized: "calendar.filter.neutral")
+        case .confused: return String(localized: "calendar.filter.confused")
+        case .anxious: return String(localized: "calendar.filter.anxious")
+        case .scary: return String(localized: "calendar.filter.scary")
         }
     }
 
@@ -74,8 +74,7 @@ struct DreamCalendarView: View {
 
     private var calendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.locale = Locale(identifier: "tr_TR")
-        cal.firstWeekday = 2
+        cal.locale = .autoupdatingCurrent
         return cal
     }
 
@@ -217,7 +216,7 @@ struct DreamCalendarView: View {
 
     private var topBar: some View {
         HStack {
-            Text("Rüya Takvimi")
+            Text(String(localized: "calendar.title"))
                 .font(DreamTheme.heading(34))
                 .foregroundStyle(Color.white)
 
@@ -265,9 +264,9 @@ struct DreamCalendarView: View {
     }
 
     private var weekdayHeader: some View {
-        // Pazartesi bazli Turkce kisaltma sirası.
-        // İleride coklu dilde locale'e gore dinamiklestirilebilir.
-        let symbols = ["P", "S", "Ç", "P", "C", "C", "P"]
+        let rawSymbols = calendar.veryShortStandaloneWeekdaySymbols
+        let firstIndex = max(0, min(calendar.firstWeekday - 1, rawSymbols.count - 1))
+        let symbols = Array(rawSymbols[firstIndex...]) + Array(rawSymbols[..<firstIndex])
 
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 7), spacing: 0) {
             ForEach(Array(symbols.enumerated()), id: \.offset) { _, symbol in
@@ -368,7 +367,7 @@ struct DreamCalendarView: View {
                         .font(DreamTheme.medium(40 * 0.60))
                         .foregroundStyle(Color.white)
 
-                    Text(selectedDayRecords.isEmpty ? "Rüya bulunamadı" : "\(selectedDayRecords.count) rüya bulundu")
+                    Text(selectedDayStatusText)
                         .font(DreamTheme.body(16))
                         .foregroundStyle(Color.white.opacity(0.72))
                 }
@@ -383,7 +382,7 @@ struct DreamCalendarView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "calendar")
                             .font(.system(size: 14, weight: .semibold))
-                        Text("Bugün")
+                        Text(String(localized: "calendar.today"))
                             .font(DreamTheme.medium(16))
                     }
                     .foregroundStyle(DreamTheme.goldStart)
@@ -405,10 +404,10 @@ struct DreamCalendarView: View {
                 VStack(spacing: 6) {
                     Text("🌙")
                         .font(.system(size: 36))
-                    Text("Bugün için kaydedilen rüya yok")
+                    Text(String(localized: "calendar.empty.none_today"))
                         .font(DreamTheme.medium(34 * 0.54))
                         .foregroundStyle(Color.white.opacity(0.85))
-                    Text("Rüyaları keşfetmek için vurgulanan bir tarihe dokunun")
+                    Text(String(localized: "calendar.empty.tap_date"))
                         .font(DreamTheme.body(14))
                         .foregroundStyle(Color.white.opacity(0.52))
                         .multilineTextAlignment(.center)
@@ -477,19 +476,43 @@ struct DreamCalendarView: View {
     private var monthStatsTitle: String {
         let monthTitle = Self.monthFormatter.string(from: startOfMonth(for: selectedDate)).capitalized
         if currentMonthRecords.isEmpty {
-            return "\(monthTitle) için kaydedilen rüya yok"
+            return String(
+                format: String(localized: "calendar.stats.empty_month_format"),
+                locale: .autoupdatingCurrent,
+                monthTitle
+            )
         }
-        return "\(monthTitle): \(currentMonthRecords.count) rüya"
+        return String(
+            format: String(localized: "calendar.stats.month_count_format"),
+            locale: .autoupdatingCurrent,
+            monthTitle,
+            currentMonthRecords.count
+        )
     }
 
     private var monthStatsSubtitle: String {
         guard !currentMonthRecords.isEmpty else {
-            return "Yeni rüyalar ekledikçe burada aylık özet göreceksin."
+            return String(localized: "calendar.stats.empty_subtitle")
         }
 
         let grouped = Dictionary(grouping: currentMonthRecords, by: { $0.mood })
-        let topMood = grouped.max(by: { $0.value.count < $1.value.count })?.key ?? "Nötr"
-        return "En yoğun duygu: \(topMood). Takvimden bir güne dokunarak detayları açabilirsin."
+        let topMood = grouped.max(by: { $0.value.count < $1.value.count })?.key ?? String(localized: "mood.neutral")
+        return String(
+            format: String(localized: "calendar.stats.top_mood_format"),
+            locale: .autoupdatingCurrent,
+            topMood
+        )
+    }
+
+    private var selectedDayStatusText: String {
+        if selectedDayRecords.isEmpty {
+            return String(localized: "calendar.day.none")
+        }
+        return String(
+            format: String(localized: "calendar.day.count_format"),
+            locale: .autoupdatingCurrent,
+            selectedDayRecords.count
+        )
     }
 
     private func dayCells(for month: Date) -> [DreamDayCell] {
@@ -600,15 +623,15 @@ struct DreamCalendarView: View {
 
     private static let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "LLLL yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("LLLL yyyy")
         return formatter
     }()
 
     private static let selectedDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "d MMMM EEEE"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("d MMMM EEEE")
         return formatter
     }()
 }

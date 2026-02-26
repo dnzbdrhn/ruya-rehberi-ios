@@ -72,7 +72,7 @@ struct DreamInterpretationView: View {
             }
             .frame(height: 24)
 
-            Text("Rüya Yorumu:")
+            Text(String(localized: "interpretation.title_prefix"))
                 .font(DreamTheme.medium(22))
                 .foregroundStyle(Color.white.opacity(0.92))
 
@@ -188,10 +188,18 @@ struct DreamInterpretationView: View {
 
     private func keywordsCard(record: DreamRecord) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Anahtar Kelimeler")
+            Text(String(localized: "interpretation.keywords"))
                 .font(DreamTheme.medium(20))
                 .foregroundStyle(Color.white)
-            FlexibleTagWrap(tags: record.symbols.isEmpty ? ["Fil", "Uçmak", "Özgürlük"] : record.symbols)
+            FlexibleTagWrap(
+                tags: record.symbols.isEmpty
+                    ? [
+                        String(localized: "interpretation.tag.elephant"),
+                        String(localized: "interpretation.tag.flying"),
+                        String(localized: "interpretation.tag.freedom")
+                    ]
+                    : record.symbols
+            )
         }
         .dreamCard(light: false, cornerRadius: 20)
     }
@@ -201,7 +209,7 @@ struct DreamInterpretationView: View {
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center) {
-                Text("Rüya Günlüğü")
+                Text(String(localized: "interpretation.journal"))
                     .font(DreamTheme.medium(20))
                     .foregroundStyle(Color.white)
 
@@ -215,7 +223,7 @@ struct DreamInterpretationView: View {
             HStack(spacing: 8) {
                 Text(emojiForMood(record.mood))
                     .font(.system(size: 16))
-                Text(record.mood.uppercased(with: Locale(identifier: "tr_TR")))
+                Text(record.mood.uppercased(with: .autoupdatingCurrent))
                     .font(DreamTheme.medium(13))
                     .foregroundStyle(Color.white.opacity(0.86))
             }
@@ -236,7 +244,7 @@ struct DreamInterpretationView: View {
     }
 
     private var expandButton: some View {
-        Button(showFullAnalysis ? "Genel Yorum Açık" : "Daha Fazla Analiz") {
+        Button(showFullAnalysis ? String(localized: "interpretation.expand.open") : String(localized: "interpretation.expand.more")) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 showFullAnalysis = true
             }
@@ -247,7 +255,7 @@ struct DreamInterpretationView: View {
 
     private func fullInterpretationCard(record: DreamRecord) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Genel Rüya Yorumu")
+            Text(String(localized: "interpretation.full_title"))
                 .font(DreamTheme.medium(21))
                 .foregroundStyle(Color.white)
             Text(record.interpretation)
@@ -261,21 +269,23 @@ struct DreamInterpretationView: View {
     private func followUpBlock(record: DreamRecord) -> some View {
         VStack(spacing: 10) {
             if !showQuestionInput {
-                Button("Yoruma Soru Sor (1 Kredi)") {
+                Button(String(localized: "interpretation.followup.ask_button")) {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         showQuestionInput = true
                     }
                 }
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
                 .dreamGoldButton()
             }
 
             if showQuestionInput {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Bu yorum için soru sor (1 kredi)")
+                    Text(String(localized: "interpretation.followup.prompt"))
                         .font(DreamTheme.medium(15))
                         .foregroundStyle(Color.white.opacity(0.9))
 
-                    TextField("Soru yaz...", text: $questionText, axis: .vertical)
+                    TextField(String(localized: "interpretation.followup.placeholder"), text: $questionText, axis: .vertical)
                         .focused($isQuestionFocused)
                         .lineLimit(3, reservesSpace: true)
                         .font(DreamTheme.body(16))
@@ -285,7 +295,13 @@ struct DreamInterpretationView: View {
                         .foregroundStyle(Color.white)
 
                     HStack {
-                        Text("Kredi: \(viewModel.credits)")
+                        Text(
+                            String(
+                                format: String(localized: "interpretation.followup.credits_format"),
+                                locale: .autoupdatingCurrent,
+                                viewModel.credits
+                            )
+                        )
                             .font(DreamTheme.body(13))
                             .foregroundStyle(Color.white.opacity(0.75))
 
@@ -299,7 +315,7 @@ struct DreamInterpretationView: View {
                                     ProgressView()
                                         .tint(DreamTheme.textDark)
                                 }
-                                Text("Gönder")
+                                Text(String(localized: "common.send"))
                             }
                             .dreamGoldButton()
                         }
@@ -316,13 +332,19 @@ struct DreamInterpretationView: View {
 
             if !record.followUps.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Son Sorular")
+                    Text(String(localized: "interpretation.followup.recent"))
                         .font(DreamTheme.medium(15))
                         .foregroundStyle(Color.white.opacity(0.9))
 
                     ForEach(Array(record.followUps.suffix(2))) { item in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("S: \(item.question)")
+                            Text(
+                                String(
+                                    format: String(localized: "interpretation.followup.question_prefix_format"),
+                                    locale: .autoupdatingCurrent,
+                                    item.question
+                                )
+                            )
                                 .font(DreamTheme.medium(14))
                                 .foregroundStyle(Color.white.opacity(0.95))
                             Text(item.answer)
@@ -342,10 +364,10 @@ struct DreamInterpretationView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Text("Rüya Yorumu")
+            Text(String(localized: "interpretation.empty.title"))
                 .font(DreamTheme.heading(30))
                 .foregroundStyle(Color.white)
-            Text("Önce bir rüya kaydedin veya ana ekrandan paylaşın.")
+            Text(String(localized: "interpretation.empty.subtitle"))
                 .font(DreamTheme.body(17))
                 .foregroundStyle(Color.white.opacity(0.86))
                 .multilineTextAlignment(.center)
@@ -395,7 +417,7 @@ struct DreamInterpretationView: View {
 
     private func primaryPreviewLine(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return "Özgürlük Arayışı ve Potansiyel." }
+        guard !trimmed.isEmpty else { return String(localized: "interpretation.preview.primary_fallback") }
 
         if let first = trimmed
             .split(whereSeparator: { $0 == "\n" || $0 == "." })
@@ -411,13 +433,13 @@ struct DreamInterpretationView: View {
     private func secondaryPreviewLine(from text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            return "Uçmak, engelleri aşma isteğini simgeler. Fil, güç ve bilgelik temasıyla ilerler."
+            return String(localized: "interpretation.preview.secondary_fallback")
         }
 
         let first = primaryPreviewLine(from: trimmed)
         let cleaned = trimmed.replacingOccurrences(of: first, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
         if cleaned.isEmpty {
-            return "Semboller, bilinçdışı mesajları ve kişisel dönüşüm ihtiyacını işaret ediyor."
+            return String(localized: "interpretation.preview.secondary_empty_fallback")
         }
         return cleaned
     }
@@ -437,11 +459,11 @@ struct DreamInterpretationView: View {
         let mood = record.mood.lowercased()
 
         var scores: [(name: String, raw: Double, color: Color)] = [
-            ("Korkunç", 0.16 + keywordWeight(text, ["korku", "karan", "canavar", "tehdit", "öl", "panik", "kaç"]), Color(red: 0.94, green: 0.37, blue: 0.32)),
-            ("Bilinçli", 0.14 + keywordWeight(text, ["fark", "kontrol", "bilinç", "gözlem", "düşün", "seçim", "karar"]), Color(red: 0.30, green: 0.84, blue: 0.86)),
-            ("Duygusal", 0.18 + keywordWeight(text, ["üz", "mutlu", "sev", "özlem", "ağla", "öfke", "yalnız", "huzur"]), Color(red: 0.96, green: 0.26, blue: 0.64)),
-            ("Kabus", 0.12 + keywordWeight(text, ["kabus", "uyand", "çığlık", "ter", "boğul", "sıkış", "çarpınt"]), Color(red: 0.56, green: 0.62, blue: 0.66)),
-            ("Gerçeküstü", 0.16 + keywordWeight(text, ["uç", "konuşan", "zaman", "uzay", "sihir", "şekil", "dönüş", "imkansız"]), Color(red: 0.57, green: 0.37, blue: 0.88))
+            (String(localized: "interpretation.metric.scary"), 0.16 + keywordWeight(text, ["korku", "karan", "canavar", "tehdit", "öl", "panik", "kaç"]), Color(red: 0.94, green: 0.37, blue: 0.32)),
+            (String(localized: "interpretation.metric.aware"), 0.14 + keywordWeight(text, ["fark", "kontrol", "bilinç", "gözlem", "düşün", "seçim", "karar"]), Color(red: 0.30, green: 0.84, blue: 0.86)),
+            (String(localized: "interpretation.metric.emotional"), 0.18 + keywordWeight(text, ["üz", "mutlu", "sev", "özlem", "ağla", "öfke", "yalnız", "huzur"]), Color(red: 0.96, green: 0.26, blue: 0.64)),
+            (String(localized: "interpretation.metric.nightmare"), 0.12 + keywordWeight(text, ["kabus", "uyand", "çığlık", "ter", "boğul", "sıkış", "çarpınt"]), Color(red: 0.56, green: 0.62, blue: 0.66)),
+            (String(localized: "interpretation.metric.surreal"), 0.16 + keywordWeight(text, ["uç", "konuşan", "zaman", "uzay", "sihir", "şekil", "dönüş", "imkansız"]), Color(red: 0.57, green: 0.37, blue: 0.88))
         ]
 
         if mood.contains("korkunç") || mood.contains("korkunc") {
@@ -489,7 +511,7 @@ struct DreamInterpretationView: View {
 
     private static let journalDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.locale = .autoupdatingCurrent
         formatter.dateFormat = "d MMMM yyyy • HH:mm"
         return formatter
     }()

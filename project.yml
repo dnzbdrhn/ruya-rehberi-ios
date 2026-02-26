@@ -17,6 +17,10 @@ targets:
         buildPhase: resources
       - path: DreamOracle/Sources/Resources/arkaplan_new.png
         buildPhase: resources
+      - path: DreamOracle/Sources/Resources/en.lproj/Localizable.strings
+        buildPhase: resources
+      - path: DreamOracle/Sources/Resources/tr.lproj/Localizable.strings
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.deniz.dreamoracle

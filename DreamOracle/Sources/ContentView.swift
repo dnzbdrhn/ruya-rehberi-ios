@@ -12,10 +12,10 @@ private enum DreamTab: Int, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .home: return "Home"
-        case .calendar: return "Takvim"
-        case .dreams: return "Rüyalarım"
-        case .profile: return "Profil"
+        case .home: return String(localized: "tab.home")
+        case .calendar: return String(localized: "tab.calendar")
+        case .dreams: return String(localized: "tab.dreams")
+        case .profile: return String(localized: "tab.profile")
         }
     }
 
