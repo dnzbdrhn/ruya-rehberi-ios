@@ -97,15 +97,15 @@ app.get("/health", (_req, res) => {
 
 app.post("/v1/dream/interpret", async (req, res) => {
   try {
-    const { model = "gpt-4.1-mini", input, max_output_tokens } = req.body || {};
-    if (!Array.isArray(input) || input.length === 0) {
-      return res.status(400).json({ error: { message: "input array is required." } });
+    const normalized = normalizeInterpretRequest(req.body || {});
+    if (normalized.errorMessage) {
+      return res.status(400).json({ error: { message: normalized.errorMessage } });
     }
 
     const response = await openai.responses.create({
-      model,
-      input,
-      max_output_tokens
+      model: normalized.model,
+      input: normalized.input,
+      max_output_tokens: normalized.maxOutputTokens
     });
 
     return res.json({
@@ -289,6 +289,55 @@ function extractGeminiImageBase64(payload) {
     }
   }
   return "";
+}
+
+function normalizeInterpretRequest(body) {
+  const model =
+    typeof body.model === "string" && body.model.trim()
+      ? body.model.trim()
+      : "gpt-4.1-mini";
+  const maxOutputTokens = Number.isFinite(body.max_output_tokens)
+    ? body.max_output_tokens
+    : undefined;
+
+  if (Array.isArray(body.input) && body.input.length > 0) {
+    return {
+      model,
+      input: body.input,
+      maxOutputTokens,
+      errorMessage: ""
+    };
+  }
+
+  if (Object.prototype.hasOwnProperty.call(body, "text")) {
+    if (typeof body.text !== "string" || !body.text.trim()) {
+      return {
+        model,
+        input: [],
+        maxOutputTokens,
+        errorMessage: "text is required."
+      };
+    }
+
+    return {
+      model,
+      input: [
+        {
+          role: "user",
+          content: [{ type: "input_text", text: body.text.trim() }]
+        }
+      ],
+      maxOutputTokens,
+      errorMessage: ""
+    };
+  }
+
+  return {
+    model,
+    input: [],
+    maxOutputTokens,
+    errorMessage: "input array is required."
+  };
 }
 
 function parseBool(value, defaultValue) {
