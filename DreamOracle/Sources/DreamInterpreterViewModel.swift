@@ -10,6 +10,34 @@ final class DreamInterpreterViewModel: ObservableObject {
         static let recordsKey = "dream_records_v2"
     }
 
+    private enum SecretsProvider {
+        static func resolve(
+            infoPlistKey: String,
+            environmentKey: String,
+            validator: (String) -> Bool
+        ) -> String {
+            let candidates = [
+                normalized(
+                    (Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String) ?? ""
+                ),
+                normalized(
+                    ProcessInfo.processInfo.environment[environmentKey] ?? ""
+                )
+            ]
+
+            for candidate in candidates where validator(candidate) {
+                return candidate
+            }
+            return ""
+        }
+
+        private static func normalized(_ rawValue: String) -> String {
+            rawValue
+                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        }
+    }
+
     @Published var dreamText = ""
     @Published var transcriptText = ""
     @Published var interpretation = ""
@@ -33,7 +61,7 @@ final class DreamInterpreterViewModel: ObservableObject {
         let openAIKey = Self.resolvedOpenAIAPIKey()
         if openAIKey.isEmpty {
             service = nil
-            errorMessage = "OPENAI_API_KEY eksik. Secrets.xcconfig veya ortami degiskenini ayarlayin."
+            errorMessage = "OPENAI_API_KEY eksik. Secrets.xcconfig veya ortam değişkenini ayarlayın."
         } else {
             service = OpenAIService(apiKey: openAIKey)
         }
@@ -508,46 +536,23 @@ final class DreamInterpreterViewModel: ObservableObject {
     }
 
     private static func resolvedOpenAIAPIKey() -> String {
-        let bundled = normalizedAPIKey(
-            (Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String) ?? ""
+        SecretsProvider.resolve(
+            infoPlistKey: "OPENAI_API_KEY",
+            environmentKey: "OPENAI_API_KEY",
+            validator: isValidOpenAIAPIKey
         )
-        if isValidOpenAIAPIKey(bundled) {
-            return bundled
-        }
-
-        let fromEnvironment = normalizedAPIKey(
-            ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
-        )
-        if isValidOpenAIAPIKey(fromEnvironment) {
-            return fromEnvironment
-        }
-
-        return ""
     }
 
     private static func resolvedGeminiAPIKey() -> String {
-        let bundled = ((Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String) ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        if isValidGeminiAPIKey(bundled) {
-            return bundled
-        }
-
-        let hardcoded = OwnerSecrets.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        if isValidGeminiAPIKey(hardcoded) {
-            return hardcoded
-        }
-
-        return ""
+        SecretsProvider.resolve(
+            infoPlistKey: "GEMINI_API_KEY",
+            environmentKey: "GEMINI_API_KEY",
+            validator: isValidGeminiAPIKey
+        )
     }
 
     private static func isValidOpenAIAPIKey(_ value: String) -> Bool {
         !value.isEmpty && !value.contains("$(") && value.hasPrefix("sk-")
-    }
-
-    private static func normalizedAPIKey(_ rawValue: String) -> String {
-        rawValue
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     }
 
     private static func isValidGeminiAPIKey(_ value: String) -> Bool {
