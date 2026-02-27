@@ -84,7 +84,9 @@ enum Analytics {
             }
 
             persist(events)
+#if DEBUG
             NSLog("Analytics %@ %@", record.name, record.payload.description)
+#endif
         }
     }
 
@@ -105,4 +107,3 @@ enum Analytics {
         defaults.set(data, forKey: eventsKey)
     }
 }
-

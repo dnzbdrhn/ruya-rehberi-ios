@@ -11,24 +11,15 @@ final class DreamInterpreterViewModel: ObservableObject {
     }
 
     private enum SecretsProvider {
-        static func resolve(
-            infoPlistKey: String,
-            environmentKey: String,
+        static func resolveGeminiDebugEnvironment(
             validator: (String) -> Bool
         ) -> String {
-            let candidates = [
-                normalized(
-                    (Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String) ?? ""
-                ),
-                normalized(
-                    ProcessInfo.processInfo.environment[environmentKey] ?? ""
-                )
-            ]
-
-            for candidate in candidates where validator(candidate) {
-                return candidate
-            }
+#if DEBUG
+            let value = normalized(ProcessInfo.processInfo.environment["GEMINI_API_KEY"] ?? "")
+            return validator(value) ? value : ""
+#else
             return ""
+#endif
         }
 
         private static func normalized(_ rawValue: String) -> String {
@@ -57,14 +48,7 @@ final class DreamInterpreterViewModel: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-
-        let openAIKey = Self.resolvedOpenAIAPIKey()
-        if openAIKey.isEmpty {
-            service = nil
-            errorMessage = "OPENAI_API_KEY eksik. Secrets.xcconfig veya ortam değişkenini ayarlayın."
-        } else {
-            service = OpenAIService(apiKey: openAIKey)
-        }
+        service = OpenAIService()
 
         let geminiKey = Self.resolvedGeminiAPIKey()
         imageService = geminiKey.isEmpty ? nil : GeminiImageService(apiKey: geminiKey)
@@ -535,24 +519,10 @@ final class DreamInterpreterViewModel: ObservableObject {
         }
     }
 
-    private static func resolvedOpenAIAPIKey() -> String {
-        SecretsProvider.resolve(
-            infoPlistKey: "OPENAI_API_KEY",
-            environmentKey: "OPENAI_API_KEY",
-            validator: isValidOpenAIAPIKey
-        )
-    }
-
     private static func resolvedGeminiAPIKey() -> String {
-        SecretsProvider.resolve(
-            infoPlistKey: "GEMINI_API_KEY",
-            environmentKey: "GEMINI_API_KEY",
+        SecretsProvider.resolveGeminiDebugEnvironment(
             validator: isValidGeminiAPIKey
         )
-    }
-
-    private static func isValidOpenAIAPIKey(_ value: String) -> Bool {
-        !value.isEmpty && !value.contains("$(") && value.hasPrefix("sk-")
     }
 
     private static func isValidGeminiAPIKey(_ value: String) -> Bool {

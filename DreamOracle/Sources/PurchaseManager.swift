@@ -107,7 +107,11 @@ final class PurchaseManager: ObservableObject {
     }
 
     private func logNonFatal(_ error: Error, context: String) {
+#if DEBUG
         NSLog("PurchaseManager non-fatal (%@): %@", context, String(describing: error))
+#else
+        _ = (error, context)
+#endif
     }
 
     private static func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {

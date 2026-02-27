@@ -190,3 +190,5 @@
 
 "locked_preview.title" = "Önizleme";
 "locked_preview.unlock" = "Tam yorumu aç";
+
+"error.backend.base_url_missing" = "Sunucu adresi yapılandırılmamış. Lütfen daha sonra tekrar deneyin.";

@@ -190,3 +190,5 @@
 
 "locked_preview.title" = "Preview";
 "locked_preview.unlock" = "Unlock full interpretation";
+
+"error.backend.base_url_missing" = "Server configuration is unavailable. Please try again later.";

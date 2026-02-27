@@ -1,12 +1,10 @@
 import Foundation
 
 struct OpenAIService {
-    private let session: URLSession
-    private let apiKey: String
+    private let client: BackendAIClient
 
-    init(apiKey: String, session: URLSession = .shared) {
-        self.apiKey = apiKey
-        self.session = session
+    init(client: BackendAIClient = .live()) {
+        self.client = client
     }
 
     func interpretDream(text: String) async throws -> String {
@@ -139,26 +137,7 @@ struct OpenAIService {
     }
 
     func transcribeAudio(fileURL: URL) async throws -> String {
-        var request = URLRequest(url: URL(string: "https://api.openai.com/v1/audio/transcriptions")!)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-
-        let boundary = "Boundary-\(UUID().uuidString)"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-        let audioData = try Data(contentsOf: fileURL)
-        var body = Data()
-
-        body.appendField(named: "model", value: "gpt-4o-mini-transcribe", using: boundary)
-        body.appendField(named: "language", value: "tr", using: boundary)
-        body.appendFile(named: "file", filename: fileURL.lastPathComponent, mimeType: "audio/m4a", fileData: audioData, using: boundary)
-        body.appendString("--\(boundary)--\r\n")
-        request.httpBody = body
-
-        let (data, response) = try await session.data(for: request)
-        try validate(response: response, data: data)
-
-        let decoded = try JSONDecoder().decode(TranscriptionResult.self, from: data)
+        let decoded = try await client.transcribeAudio(fileURL: fileURL)
         let text = decoded.text.trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
             throw OpenAIServiceError.invalidResponse("Transkript bos dondu.")
@@ -171,11 +150,6 @@ struct OpenAIService {
         userInput: String,
         maxOutputTokens: Int
     ) async throws -> String {
-        var request = URLRequest(url: URL(string: "https://api.openai.com/v1/responses")!)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-
         let body = ResponseRequest(
             model: "gpt-4.1-mini",
             input: [
@@ -185,12 +159,8 @@ struct OpenAIService {
             maxOutputTokens: maxOutputTokens
         )
 
-        request.httpBody = try JSONEncoder().encode(body)
+        let decoded = try await client.interpret(body)
 
-        let (data, response) = try await session.data(for: request)
-        try validate(response: response, data: data)
-
-        let decoded = try JSONDecoder().decode(ResponseResult.self, from: data)
         if let outputText = decoded.outputText?.trimmingCharacters(in: .whitespacesAndNewlines), !outputText.isEmpty {
             return outputText
         }
@@ -206,6 +176,70 @@ struct OpenAIService {
 
         throw OpenAIServiceError.invalidResponse("Model cevabindan metin cikartilamadi.")
     }
+}
+
+struct BackendAIClient {
+    private let session: URLSession
+    private let baseURL: URL
+    private let debugAuthToken: String?
+
+    init(
+        baseURL: URL = BackendConfiguration.resolveBaseURL(),
+        session: URLSession = .shared,
+        debugAuthToken: String? = BackendConfiguration.resolveDebugAuthToken()
+    ) {
+        self.baseURL = baseURL
+        self.session = session
+        self.debugAuthToken = debugAuthToken
+    }
+
+    static func live() -> BackendAIClient {
+        BackendAIClient()
+    }
+
+    fileprivate func interpret(_ requestBody: ResponseRequest) async throws -> ResponseResult {
+        try BackendConfiguration.validateRuntimeBaseURL(baseURL)
+        var request = makeJSONRequest(path: "v1/dream/interpret")
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await session.data(for: request)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(ResponseResult.self, from: data)
+    }
+
+    func transcribeAudio(fileURL: URL) async throws -> BackendTranscriptionResult {
+        try BackendConfiguration.validateRuntimeBaseURL(baseURL)
+        let fileData = try Data(contentsOf: fileURL)
+        let payload = BackendTranscriptionRequest(
+            model: "gpt-4o-mini-transcribe",
+            language: "tr",
+            filename: fileURL.lastPathComponent,
+            mimeType: Self.mimeType(for: fileURL),
+            audioBase64: fileData.base64EncodedString()
+        )
+
+        var request = makeJSONRequest(path: "v1/dream/transcribe")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (data, response) = try await session.data(for: request)
+        try validate(response: response, data: data)
+        return try JSONDecoder().decode(BackendTranscriptionResult.self, from: data)
+    }
+
+    private func makeJSONRequest(path: String) -> URLRequest {
+        let normalizedPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
+        let url = baseURL.appendingPathComponent(normalizedPath)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+#if DEBUG
+        if let token = debugAuthToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+#endif
+        return request
+    }
 
     private func validate(response: URLResponse, data: Data) throws {
         guard let http = response as? HTTPURLResponse else {
@@ -217,6 +251,59 @@ struct OpenAIService {
             }
             throw OpenAIServiceError.apiError("HTTP \(http.statusCode) hatasi.")
         }
+    }
+
+    private static func mimeType(for fileURL: URL) -> String {
+        switch fileURL.pathExtension.lowercased() {
+        case "m4a":
+            return "audio/m4a"
+        case "mp3":
+            return "audio/mpeg"
+        case "wav":
+            return "audio/wav"
+        default:
+            return "application/octet-stream"
+        }
+    }
+}
+
+private enum BackendConfiguration {
+    private static let fallbackBaseURL = URL(string: "https://backend.example.com")!
+    private static let placeholderHost = "backend.example.com"
+
+    static func resolveBaseURL() -> URL {
+        let raw = ((Bundle.main.object(forInfoDictionaryKey: "BACKEND_BASE_URL") as? String) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if
+            let url = URL(string: raw),
+            let scheme = url.scheme?.lowercased(),
+            ["http", "https"].contains(scheme),
+            !raw.isEmpty
+        {
+            return url
+        }
+        return fallbackBaseURL
+    }
+
+    static func validateRuntimeBaseURL(_ baseURL: URL) throws {
+#if DEBUG
+        _ = baseURL
+#else
+        let host = (baseURL.host ?? "").lowercased()
+        if host.isEmpty || host == placeholderHost {
+            throw OpenAIServiceError.backendBaseURLMissing
+        }
+#endif
+    }
+
+    static func resolveDebugAuthToken() -> String? {
+#if DEBUG
+        let token = (ProcessInfo.processInfo.environment["BACKEND_AUTH_TOKEN"] ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return token.isEmpty ? nil : token
+#else
+        return nil
+#endif
     }
 }
 
@@ -282,7 +369,7 @@ private extension OpenAIService {
     """
 }
 
-private struct ResponseRequest: Encodable {
+fileprivate struct ResponseRequest: Encodable {
     let model: String
     let input: [ResponseInput]
     let maxOutputTokens: Int
@@ -294,17 +381,17 @@ private struct ResponseRequest: Encodable {
     }
 }
 
-private struct ResponseInput: Encodable {
+fileprivate struct ResponseInput: Encodable {
     let role: String
     let content: [ResponseInputContent]
 }
 
-private struct ResponseInputContent: Encodable {
+fileprivate struct ResponseInputContent: Encodable {
     let type: String
     let text: String
 }
 
-private struct ResponseResult: Decodable {
+fileprivate struct ResponseResult: Decodable {
     let outputText: String?
     let output: [ResponseOutput]?
 
@@ -314,15 +401,23 @@ private struct ResponseResult: Decodable {
     }
 }
 
-private struct ResponseOutput: Decodable {
+fileprivate struct ResponseOutput: Decodable {
     let content: [ResponseOutputContent]?
 }
 
-private struct ResponseOutputContent: Decodable {
+fileprivate struct ResponseOutputContent: Decodable {
     let text: String?
 }
 
-private struct TranscriptionResult: Decodable {
+private struct BackendTranscriptionRequest: Encodable {
+    let model: String
+    let language: String
+    let filename: String
+    let mimeType: String
+    let audioBase64: String
+}
+
+struct BackendTranscriptionResult: Decodable {
     let text: String
 }
 
@@ -337,33 +432,16 @@ private struct APIError: Decodable {
 enum OpenAIServiceError: LocalizedError {
     case apiError(String)
     case invalidResponse(String)
+    case backendBaseURLMissing
 
     var errorDescription: String? {
         switch self {
         case .apiError(let message):
-            return "OpenAI hatasi: \(message)"
+            return "AI servis hatasi: \(message)"
         case .invalidResponse(let message):
             return "Gecersiz API cevabi: \(message)"
+        case .backendBaseURLMissing:
+            return String(localized: "error.backend.base_url_missing")
         }
-    }
-}
-
-private extension Data {
-    mutating func appendString(_ string: String) {
-        append(Data(string.utf8))
-    }
-
-    mutating func appendField(named name: String, value: String, using boundary: String) {
-        appendString("--\(boundary)\r\n")
-        appendString("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n")
-        appendString("\(value)\r\n")
-    }
-
-    mutating func appendFile(named name: String, filename: String, mimeType: String, fileData: Data, using boundary: String) {
-        appendString("--\(boundary)\r\n")
-        appendString("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n")
-        appendString("Content-Type: \(mimeType)\r\n\r\n")
-        append(fileData)
-        appendString("\r\n")
     }
 }

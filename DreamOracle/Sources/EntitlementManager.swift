@@ -164,7 +164,11 @@ final class EntitlementManager: ObservableObject {
     }
 
     private func logNonFatal(_ error: Error, context: String) {
+#if DEBUG
         NSLog("EntitlementManager non-fatal (%@): %@", context, String(describing: error))
+#else
+        _ = (error, context)
+#endif
     }
 }
 
