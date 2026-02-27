@@ -27,3 +27,4 @@ Secrets.xcconfig
 OwnerSecrets.swift
 DreamOracle/Sources/OwnerSecrets.swift
 DreamOracle/Sources/OwnerSecrets.swift
+server/.env
