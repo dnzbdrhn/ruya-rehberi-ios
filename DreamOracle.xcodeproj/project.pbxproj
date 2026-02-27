@@ -10,6 +10,7 @@
 		0E98D9C2A42363B606E56115 /* DreamInterpretationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */; };
 		1B9FE479C73F52C20B22E44F /* DreamTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769850A7924593ADFD99B0BD /* DreamTheme.swift */; };
 		2267FCE02F5078880000DE8D /* DreamOracle.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2267FCDF2F5078880000DE8D /* DreamOracle.storekit */; };
+		2267FCE22F50E6AC0000DE8D /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 2267FCE12F50E6AC0000DE8D /* Secrets.xcconfig */; };
 		22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */ = {isa = PBXBuildFile; fileRef = F80B1DA8D1973537461737E9 /* arkaplan_new.png */; };
 		275493F4B225F3985B883BCD /* DreamInterpreterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEB2444D33246DB8672C24C /* DreamInterpreterViewModel.swift */; };
 		35791448D2B551B00684B08A /* DreamCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3DD212FF326452F5A807E2 /* DreamCalendarView.swift */; };
@@ -41,6 +42,7 @@
 
 /* Begin PBXFileReference section */
 		2267FCDF2F5078880000DE8D /* DreamOracle.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = DreamOracle.storekit; path = DreamOracle/Sources/DreamOracle.storekit; sourceTree = "<group>"; };
+		2267FCE12F50E6AC0000DE8D /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		26A758E7DD1EECF6FF03CD8E /* DreamInterpretationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamInterpretationView.swift; sourceTree = "<group>"; };
 		27DB1D836029CEF9CFD23E1C /* DreamHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamHomeView.swift; sourceTree = "<group>"; };
 		2C0330D4D45412A507E8ACA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -48,7 +50,7 @@
 		317F066047EFBC7A0BFDA91A /* GeminiImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiImageService.swift; sourceTree = "<group>"; };
 		5FEAF04EB517670381F0BA85 /* OpenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
 		6D99036A1666A6D00E90C6DA /* arkaplan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arkaplan.png; sourceTree = "<group>"; };
-		6ECA7F824CD31925E8CB7A38 /* DreamOracle.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DreamOracle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6ECA7F824CD31925E8CB7A38 /* DreamOracle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DreamOracle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74447E6461513642E8481C36 /* DreamModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamModels.swift; sourceTree = "<group>"; };
 		769850A7924593ADFD99B0BD /* DreamTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamTheme.swift; sourceTree = "<group>"; };
 		7EE714A0506A271661A117C6 /* DreamOracleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamOracleApp.swift; sourceTree = "<group>"; };
@@ -66,7 +68,6 @@
 		A1F9C4642C8B522200AA1001 /* PaywallPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPresenter.swift; sourceTree = "<group>"; };
 		A1F9C4732C8B532200AA1001 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		A1F9C4742C8B532200AA1001 /* DebugEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugEventsView.swift; sourceTree = "<group>"; };
-		A1F9C4802C8B542200AA1001 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		AFA4C93D05743FA9A672BDB7 /* DreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailView.swift; sourceTree = "<group>"; };
 		CD57AA43B831D540C14917E4 /* DreamProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamProfileView.swift; sourceTree = "<group>"; };
 		D253BC4F542BBC61BB18D688 /* DreamComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamComposerView.swift; sourceTree = "<group>"; };
@@ -125,7 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				2267FCDF2F5078880000DE8D /* DreamOracle.storekit */,
-				A1F9C4802C8B542200AA1001 /* Secrets.xcconfig */,
+				2267FCE12F50E6AC0000DE8D /* Secrets.xcconfig */,
 				3E103F93EB6675D539D79374 /* Resources */,
 				409D55A747D5A735F4A0C775 /* Sources */,
 				B570730CE017E9B3ED171A48 /* Products */,
@@ -200,6 +201,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1F9C3F12C8A4D1200AA1001 /* Localizable.strings in Resources */,
+				2267FCE22F50E6AC0000DE8D /* Secrets.xcconfig in Resources */,
 				44DD0D38B447FE26D133D24C /* arkaplan.png in Resources */,
 				2267FCE02F5078880000DE8D /* DreamOracle.storekit in Resources */,
 				22FB83CB8717BFCBAAA54DBB /* arkaplan_new.png in Resources */,
@@ -318,7 +320,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				GEMINI_API_KEY = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = RuyaYorum;
 				INFOPLIST_KEY_GEMINI_API_KEY = "$(GEMINI_API_KEY)";
@@ -334,7 +335,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OPENAI_API_KEY = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.deniz.dreamoracle;
 				PRODUCT_NAME = DreamOracle;
 				SDKROOT = iphoneos;
@@ -345,12 +345,11 @@
 		};
 		B7FD299549046B2F439A2A38 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1F9C4802C8B542200AA1001 /* Secrets.xcconfig */;
+			baseConfigurationReference = 2267FCE12F50E6AC0000DE8D /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				GEMINI_API_KEY = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = RuyaYorum;
 				INFOPLIST_KEY_GEMINI_API_KEY = "$(GEMINI_API_KEY)";
@@ -366,7 +365,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OPENAI_API_KEY = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.deniz.dreamoracle;
 				PRODUCT_NAME = DreamOracle;
 				SDKROOT = iphoneos;
@@ -377,7 +375,6 @@
 		};
 		D5FA0ACB397436F9C1050FB9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1F9C4802C8B542200AA1001 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

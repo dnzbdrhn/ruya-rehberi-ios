@@ -30,8 +30,6 @@ targets:
         SWIFT_VERSION: 5.9
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
-        OPENAI_API_KEY: ""
-        GEMINI_API_KEY: ""
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: RuyaYorum
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Ruya anlatimini kaydetmek icin mikrofona ihtiyac var.
