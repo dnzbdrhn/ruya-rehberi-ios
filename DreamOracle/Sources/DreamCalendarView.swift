@@ -36,22 +36,22 @@ private enum DreamMoodFilter: String, CaseIterable, Identifiable {
     }
 
     func matches(mood: String) -> Bool {
-        let normalized = mood.lowercased()
+        let detected = DreamMoodKind.detect(from: mood)
         switch self {
         case .all:
             return true
         case .peaceful:
-            return normalized.contains("huzurlu")
+            return detected == .peaceful
         case .great:
-            return normalized.contains("harika")
+            return detected == .great
         case .neutral:
-            return normalized.contains("nötr") || normalized.contains("notr")
+            return detected == .neutral
         case .confused:
-            return normalized.contains("kafası karışık") || normalized.contains("kafasi karisik")
+            return detected == .confused
         case .anxious:
-            return normalized.contains("kaygılı") || normalized.contains("kaygili")
+            return detected == .anxious
         case .scary:
-            return normalized.contains("korkunç") || normalized.contains("korkunc")
+            return detected == .scary
         }
     }
 }
@@ -496,11 +496,11 @@ struct DreamCalendarView: View {
         }
 
         let grouped = Dictionary(grouping: currentMonthRecords, by: { $0.mood })
-        let topMood = grouped.max(by: { $0.value.count < $1.value.count })?.key ?? String(localized: "mood.neutral")
+        let topMood = grouped.max(by: { $0.value.count < $1.value.count })?.key ?? defaultDreamMoodLabel()
         return String(
             format: String(localized: "calendar.stats.top_mood_format"),
             locale: .autoupdatingCurrent,
-            topMood
+            localizedMoodLabel(for: topMood)
         )
     }
 
@@ -612,13 +612,7 @@ struct DreamCalendarView: View {
     }
 
     private func emojiForMood(_ mood: String) -> String {
-        let lower = mood.lowercased()
-        if lower.contains("huzurlu") { return "😌" }
-        if lower.contains("harika") { return "😍" }
-        if lower.contains("kafası karışık") || lower.contains("kafasi karisik") { return "🤔" }
-        if lower.contains("kaygılı") || lower.contains("kaygili") { return "😰" }
-        if lower.contains("korkunç") || lower.contains("korkunc") { return "😱" }
-        return "😐"
+        moodEmoji(for: mood)
     }
 
     private static let monthFormatter: DateFormatter = {

@@ -5,6 +5,82 @@ enum DreamInputSource: String, Codable {
     case voice
 }
 
+enum DreamMoodKind: String, CaseIterable {
+    case peaceful
+    case great
+    case neutral
+    case confused
+    case anxious
+    case scary
+
+    var localizationKey: String {
+        "mood.\(rawValue)"
+    }
+
+    var emoji: String {
+        switch self {
+        case .peaceful: return "😌"
+        case .great: return "😍"
+        case .neutral: return "😐"
+        case .confused: return "🤔"
+        case .anxious: return "😰"
+        case .scary: return "😱"
+        }
+    }
+
+    private var tokens: [String] {
+        switch self {
+        case .peaceful:
+            return ["huzurlu", "peaceful"]
+        case .great:
+            return ["harika", "great"]
+        case .neutral:
+            return ["notr", "neutral"]
+        case .confused:
+            return ["kafasi karisik", "confused"]
+        case .anxious:
+            return ["kaygili", "anxious"]
+        case .scary:
+            return ["korkunc", "scary"]
+        }
+    }
+
+    static func detect(from rawMood: String) -> DreamMoodKind? {
+        let normalized = rawMood
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .autoupdatingCurrent)
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !normalized.isEmpty else { return nil }
+        return allCases.first { mood in
+            mood.tokens.contains(where: { normalized.contains($0) })
+        }
+    }
+}
+
+func localizedMoodLabel(for mood: String) -> String {
+    if let detected = DreamMoodKind.detect(from: mood) {
+        return String(localized: String.LocalizationValue(detected.localizationKey))
+    }
+    return mood
+}
+
+func moodEmoji(for mood: String) -> String {
+    DreamMoodKind.detect(from: mood)?.emoji ?? DreamMoodKind.neutral.emoji
+}
+
+func defaultDreamMoodLabel() -> String {
+    String(localized: "mood.neutral")
+}
+
+func untitledDreamTitle() -> String {
+    String(localized: "dream.title.untitled")
+}
+
+func dreamAutoFallbackTitle() -> String {
+    String(localized: "dream.title.night_echo")
+}
+
 struct DreamFollowUp: Identifiable, Codable {
     let id: UUID
     let askedAt: Date
@@ -45,7 +121,7 @@ struct DreamRecord: Identifiable, Codable {
         previewImageBase64: String? = nil,
         symbols: [String] = [],
         clarity: Double = 0.5,
-        mood: String = "Nötr",
+        mood: String = defaultDreamMoodLabel(),
         isFavorite: Bool = false,
         followUps: [DreamFollowUp] = []
     ) {
@@ -66,7 +142,7 @@ struct DreamRecord: Identifiable, Codable {
 
     var displayTitle: String {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Adsiz Ruya" : trimmed
+        return trimmed.isEmpty ? untitledDreamTitle() : trimmed
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -89,7 +165,7 @@ struct DreamRecord: Identifiable, Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
-        title = try container.decodeIfPresent(String.self, forKey: .title) ?? "Adsiz Ruya"
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? untitledDreamTitle()
         source = try container.decodeIfPresent(DreamInputSource.self, forKey: .source) ?? .typed
         dreamText = try container.decodeIfPresent(String.self, forKey: .dreamText) ?? ""
         interpretation = try container.decodeIfPresent(String.self, forKey: .interpretation) ?? ""
@@ -97,7 +173,7 @@ struct DreamRecord: Identifiable, Codable {
         previewImageBase64 = try container.decodeIfPresent(String.self, forKey: .previewImageBase64)
         symbols = try container.decodeIfPresent([String].self, forKey: .symbols) ?? []
         clarity = try container.decodeIfPresent(Double.self, forKey: .clarity) ?? 0.5
-        mood = try container.decodeIfPresent(String.self, forKey: .mood) ?? "Nötr"
+        mood = try container.decodeIfPresent(String.self, forKey: .mood) ?? defaultDreamMoodLabel()
         isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         followUps = try container.decodeIfPresent([DreamFollowUp].self, forKey: .followUps) ?? []
     }

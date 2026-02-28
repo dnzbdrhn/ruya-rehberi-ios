@@ -252,7 +252,7 @@ struct DreamInterpretationView: View {
             HStack(spacing: 8) {
                 Text(emojiForMood(record.mood))
                     .font(.system(size: 16))
-                Text(record.mood.uppercased(with: .autoupdatingCurrent))
+                Text(localizedMoodLabel(for: record.mood).uppercased(with: .autoupdatingCurrent))
                     .font(DreamTheme.medium(13))
                     .foregroundStyle(Color.white.opacity(0.86))
             }
@@ -507,18 +507,12 @@ struct DreamInterpretationView: View {
     }
 
     private func emojiForMood(_ mood: String) -> String {
-        let lower = mood.lowercased()
-        if lower.contains("huzurlu") { return "😌" }
-        if lower.contains("harika") { return "😍" }
-        if lower.contains("kafası karışık") || lower.contains("kafasi karisik") { return "🤔" }
-        if lower.contains("kaygılı") || lower.contains("kaygili") { return "😰" }
-        if lower.contains("korkunç") || lower.contains("korkunc") { return "😱" }
-        return "😐"
+        moodEmoji(for: mood)
     }
 
     private func dreamMetrics(for record: DreamRecord) -> [DreamMetric] {
         let text = record.dreamText.lowercased()
-        let mood = record.mood.lowercased()
+        let moodKind = DreamMoodKind.detect(from: record.mood)
 
         var scores: [(name: String, raw: Double, color: Color)] = [
             (String(localized: "interpretation.metric.scary"), 0.16 + keywordWeight(text, ["korku", "karan", "canavar", "tehdit", "öl", "panik", "kaç"]), Color(red: 0.94, green: 0.37, blue: 0.32)),
@@ -528,17 +522,17 @@ struct DreamInterpretationView: View {
             (String(localized: "interpretation.metric.surreal"), 0.16 + keywordWeight(text, ["uç", "konuşan", "zaman", "uzay", "sihir", "şekil", "dönüş", "imkansız"]), Color(red: 0.57, green: 0.37, blue: 0.88))
         ]
 
-        if mood.contains("korkunç") || mood.contains("korkunc") {
+        if moodKind == .scary {
             scores[0].raw += 0.12
             scores[3].raw += 0.08
-        } else if mood.contains("kaygılı") || mood.contains("kaygili") {
+        } else if moodKind == .anxious {
             scores[0].raw += 0.06
             scores[3].raw += 0.05
             scores[2].raw += 0.04
-        } else if mood.contains("harika") {
+        } else if moodKind == .great {
             scores[1].raw += 0.06
             scores[2].raw += 0.07
-        } else if mood.contains("huzurlu") {
+        } else if moodKind == .peaceful {
             scores[1].raw += 0.06
             scores[2].raw += 0.04
         }
@@ -574,7 +568,7 @@ struct DreamInterpretationView: View {
     private static let journalDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
-        formatter.dateFormat = "d MMMM yyyy • HH:mm"
+        formatter.setLocalizedDateFormatFromTemplate(String(localized: "interpretation.journal.date_template"))
         return formatter
     }()
 }

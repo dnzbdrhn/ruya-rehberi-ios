@@ -181,16 +181,16 @@ struct OpenAIService {
 struct BackendAIClient {
     private let session: URLSession
     private let baseURL: URL
-    private let debugAuthToken: String?
+    private let optionalAuthToken: String?
 
     init(
         baseURL: URL = BackendConfiguration.resolveBaseURL(),
         session: URLSession = .shared,
-        debugAuthToken: String? = BackendConfiguration.resolveDebugAuthToken()
+        optionalAuthToken: String? = BackendConfiguration.resolveOptionalAuthToken()
     ) {
         self.baseURL = baseURL
         self.session = session
-        self.debugAuthToken = debugAuthToken
+        self.optionalAuthToken = optionalAuthToken
     }
 
     static func live() -> BackendAIClient {
@@ -233,8 +233,8 @@ struct BackendAIClient {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-#if DEBUG
-        if let token = debugAuthToken {
+#if DEBUG || ALLOW_PLIST_TEST_TOKEN
+        if let token = optionalAuthToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 #endif
@@ -296,14 +296,27 @@ private enum BackendConfiguration {
 #endif
     }
 
-    static func resolveDebugAuthToken() -> String? {
+    static func resolveOptionalAuthToken() -> String? {
 #if DEBUG
-        let token = (ProcessInfo.processInfo.environment["BACKEND_AUTH_TOKEN"] ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return token.isEmpty ? nil : token
+        if let envToken = normalizedToken(ProcessInfo.processInfo.environment["BACKEND_AUTH_TOKEN"] ?? "") {
+            return envToken
+        }
+#else
+#if !ALLOW_PLIST_TEST_TOKEN
+        return nil
+#endif
+#endif
+
+#if ALLOW_PLIST_TEST_TOKEN
+        return normalizedToken((Bundle.main.object(forInfoDictionaryKey: "BACKEND_AUTH_TOKEN") as? String) ?? "")
 #else
         return nil
 #endif
+    }
+
+    private static func normalizedToken(_ rawToken: String) -> String? {
+        let value = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        return value.isEmpty ? nil : value
     }
 }
 

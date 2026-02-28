@@ -271,23 +271,16 @@ private struct DreamBottomTabBar: View {
     }
 
     var body: some View {
-        HStack(spacing: spacing) {
-            ForEach(tabs) { tab in
-                tabButton(tab)
+        GlassSurface(style: .pill, themeStyle: .night, cornerRadius: 31) {
+            HStack(spacing: spacing) {
+                ForEach(tabs) { tab in
+                    tabButton(tab)
+                }
             }
+            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, 8)
         }
         .frame(width: barWidth)
-        .padding(.horizontal, horizontalPadding)
-        .padding(.vertical, 8)
-        .background(
-            Capsule()
-                .fill(Color.white.opacity(0.84))
-        )
-        .overlay(
-            Capsule()
-                .stroke(Color.white.opacity(0.62), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
     }
 
     private func tabButton(_ tab: DreamTab) -> some View {

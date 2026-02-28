@@ -38,49 +38,11 @@ enum DreamLayout {
 
 struct DreamBackground: View {
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                LinearGradient(
-                    colors: [DreamTheme.skyTop, DreamTheme.skyMiddle, DreamTheme.skyBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-
-                RadialGradient(
-                    colors: [Color.white.opacity(0.14), Color.clear],
-                    center: .topTrailing,
-                    startRadius: 0,
-                    endRadius: proxy.size.width * 0.82
-                )
-                .ignoresSafeArea()
-
-                ForEach(0..<28, id: \.self) { index in
-                    Image(systemName: index.isMultiple(of: 3) ? "sparkles" : "circle.fill")
-                        .font(.system(size: CGFloat(index.isMultiple(of: 3) ? 8 : ((index % 2) + 2))))
-                        .foregroundStyle(Color.white.opacity(index.isMultiple(of: 3) ? 0.62 : 0.5))
-                        .position(starPoint(index: index, in: proxy.size))
-                }
-
-                CloudShapes()
-                    .fill(Color.white.opacity(0.11))
-                    .frame(width: proxy.size.width * 1.30, height: proxy.size.height * 0.47)
-                    .offset(y: proxy.size.height * 0.34)
-
-                CloudShapes()
-                    .fill(Color.white.opacity(0.06))
-                    .frame(width: proxy.size.width * 1.35, height: proxy.size.height * 0.52)
-                    .offset(y: proxy.size.height * 0.22)
-            }
-        }
-    }
-
-    private func starPoint(index: Int, in size: CGSize) -> CGPoint {
-        let xTable: [CGFloat] = [0.04, 0.11, 0.20, 0.31, 0.43, 0.57, 0.66, 0.74, 0.82, 0.92, 0.26, 0.49]
-        let yTable: [CGFloat] = [0.03, 0.06, 0.09, 0.14, 0.18, 0.22, 0.27, 0.12, 0.16, 0.21, 0.29, 0.08]
-        let x = xTable[index % xTable.count] * size.width
-        let y = yTable[index % yTable.count] * size.height
-        return CGPoint(x: x, y: y)
+        MysticalBackgroundView(
+            prefersAsset: true,
+            themeStyle: .night,
+            emphasizedReadableZone: .middle
+        )
     }
 }
 

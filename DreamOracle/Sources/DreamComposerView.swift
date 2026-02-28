@@ -34,7 +34,6 @@ struct DreamComposerView: View {
     @FocusState private var isFragmentsFocused: Bool
 
     private let moodEmojis = ["😌", "😍", "😐", "🤔", "😰", "😱"]
-    private let moodValues = ["Huzurlu", "Harika", "Nötr", "Kafası Karışık", "Kaygılı", "Korkunç"]
     private let moodTitleKeys = [
         "composer.mood.peaceful",
         "composer.mood.great",
@@ -42,6 +41,14 @@ struct DreamComposerView: View {
         "composer.mood.confused",
         "composer.mood.anxious",
         "composer.mood.scary"
+    ]
+    private let moodValueKeys = [
+        "composer.mood.value.peaceful",
+        "composer.mood.value.great",
+        "composer.mood.value.neutral",
+        "composer.mood.value.confused",
+        "composer.mood.value.anxious",
+        "composer.mood.value.scary"
     ]
 
     init(
@@ -96,8 +103,7 @@ struct DreamComposerView: View {
                 interpretSavedDream()
             }
             Button(String(localized: "composer.skip_for_now")) {
-                showSavedSuccessMessage = false
-                dismiss()
+                pendingInterpretationContext = nil
             }
             Button(String(localized: "common.close"), role: .cancel) {}
         }
@@ -105,7 +111,7 @@ struct DreamComposerView: View {
 
     private var selectedMoodIndex: Int {
         let index = Int(moodSliderValue.rounded())
-        return min(max(index, 0), moodValues.count - 1)
+        return min(max(index, 0), moodTitleKeys.count - 1)
     }
 
     private var selectedMoodTitle: String {
@@ -113,7 +119,7 @@ struct DreamComposerView: View {
     }
 
     private var selectedMoodValue: String {
-        moodValues[selectedMoodIndex]
+        String(localized: String.LocalizationValue(moodValueKeys[selectedMoodIndex]))
     }
 
     private var topBar: some View {
@@ -367,7 +373,7 @@ struct DreamComposerView: View {
                     }
                 }
 
-                Slider(value: $moodSliderValue, in: 0...Double(moodValues.count - 1), step: 1)
+                Slider(value: $moodSliderValue, in: 0...Double(moodTitleKeys.count - 1), step: 1)
                     .tint(Color.white)
 
                 Text(selectedMoodTitle)

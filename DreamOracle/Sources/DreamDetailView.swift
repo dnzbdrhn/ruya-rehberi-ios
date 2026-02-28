@@ -213,11 +213,34 @@ private enum DreamObjectCategory: CaseIterable, Identifiable {
             for alias in term.aliases {
                 let normalizedAlias = DreamObjectCategory.normalized(alias)
                 if DreamObjectCategory.matches(token: normalizedToken, alias: normalizedAlias) {
-                    return term.label
+                    return DreamObjectCategory.localizedLabel(for: term.label)
                 }
             }
         }
         return nil
+    }
+
+    private static func localizedLabel(for label: String) -> String {
+        let key = localizationKey(for: label)
+        let localized = String(localized: String.LocalizationValue(key))
+        return localized == key ? label : localized
+    }
+
+    private static func localizationKey(for label: String) -> String {
+        let latin = label.applyingTransform(.toLatin, reverse: false) ?? label
+        let ascii = (latin.applyingTransform(.stripDiacritics, reverse: false) ?? latin)
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let keyBody = ascii
+            .map { character in
+                if character.isLetter || character.isNumber {
+                    return character
+                }
+                return "_"
+            }
+            .split(separator: "_")
+            .joined(separator: "_")
+        return "journal.term.\(keyBody)"
     }
 
     private static func normalized(_ value: String) -> String {
@@ -821,21 +844,25 @@ struct DreamJournalHubView: View {
     }
 
     private func moodDistribution(records: [DreamRecord]) -> [DreamMoodShare] {
-        let mappings: [(title: String, emoji: String, matcher: (String) -> Bool)] = [
-            (String(localized: "mood.peaceful"), "😌", { text in text.contains("huzurlu") }),
-            (String(localized: "mood.great"), "😍", { text in text.contains("harika") }),
-            (String(localized: "mood.neutral"), "😐", { text in text.contains("notr") || text.contains("nötr") }),
-            (String(localized: "mood.confused"), "🤔", { text in text.contains("kafasi") || text.contains("kafası") }),
-            (String(localized: "mood.anxious"), "😰", { text in text.contains("kaygili") || text.contains("kaygılı") }),
-            (String(localized: "mood.scary"), "😱", { text in text.contains("korkunc") || text.contains("korkunç") })
+        let mappings: [DreamMoodKind] = [
+            .peaceful,
+            .great,
+            .neutral,
+            .confused,
+            .anxious,
+            .scary
         ]
 
-        return mappings.map { item in
+        return mappings.map { moodKind in
             let count = records.reduce(0) { result, record in
-                let mood = normalized(record.mood)
-                return result + (item.matcher(mood) ? 1 : 0)
+                let detected = DreamMoodKind.detect(from: record.mood)
+                return result + (detected == moodKind ? 1 : 0)
             }
-            return DreamMoodShare(emoji: item.emoji, title: item.title, count: count)
+            return DreamMoodShare(
+                emoji: moodKind.emoji,
+                title: String(localized: String.LocalizationValue(moodKind.localizationKey)),
+                count: count
+            )
         }
     }
 
@@ -844,13 +871,7 @@ struct DreamJournalHubView: View {
     }
 
     private func emojiForMood(_ mood: String) -> String {
-        let lower = mood.lowercased()
-        if lower.contains("huzurlu") { return "😌" }
-        if lower.contains("harika") { return "😍" }
-        if lower.contains("kafası karışık") || lower.contains("kafasi karisik") { return "🤔" }
-        if lower.contains("kaygılı") || lower.contains("kaygili") { return "😰" }
-        if lower.contains("korkunç") || lower.contains("korkunc") { return "😱" }
-        return "😐"
+        moodEmoji(for: mood)
     }
 
     private static let cardDateFormatter: DateFormatter = {

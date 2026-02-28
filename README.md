@@ -12,8 +12,9 @@ Kullanici:
 ## Mimari (AI)
 
 - iOS istemci OpenAI anahtari tutmaz.
+- iOS istemci Gemini anahtari tutmaz.
 - iOS sadece backend endpoint'lerine gider.
-- OpenAI anahtari sadece server ortam degiskeninde bulunur.
+- OpenAI/Gemini anahtarlari sadece server ortam degiskenlerinde bulunur.
 
 ## Kurulum
 
@@ -38,23 +39,23 @@ cp Secrets.xcconfig.example Secrets.xcconfig
 
 ## Local Development (iOS + Server)
 
-- iOS tarafinda `OPENAI_API_KEY` gerekmez.
+- iOS tarafinda `OPENAI_API_KEY` veya `GEMINI_API_KEY` gerekmez.
 - Debug icin `BACKEND_BASE_URL` guvenli bir config olarak `Info.plist` uzerinden okunur.
-- `BACKEND_AUTH_TOKEN` (opsiyonel) sadece Debug'da environment variable olarak verilebilir.
-- Release build `Authorization` header gondermez.
+- `BACKEND_AUTH_TOKEN` (opsiyonel) sadece Debug'da Xcode Run environment variable olarak verilebilir.
+- Release build varsayilan olarak `Authorization` header gondermez.
 
 Server'i lokal calistirma:
 1. `server/` klasorune gir.
 2. `npm install` calistir.
-3. `OPENAI_API_KEY` environment variable ayarla.
-4. `NODE_ENV=development` ile `npm run dev` baslat.
-5. Isteyenler icin lokal auth:
-   - `BACKEND_AUTH_TOKEN` tanimla veya
-   - varsayilan dev token `dev-local-token` kullan.
+3. `.env.example` dosyasini `.env` olarak kopyala.
+4. En az `OPENAI_API_KEY` ve `GEMINI_API_KEY` ayarla.
+5. TestFlight/Simulator benzeri test modu icin `REQUIRE_AUTH=false` kullan.
+6. `npm run dev` ile server'i baslat.
 
 Uretim auth:
-- `NODE_ENV=production` ve `BACKEND_AUTH_TOKEN` zorunludur.
-- `/v1/*` endpointleri `Authorization: Bearer <BACKEND_AUTH_TOKEN>` ister.
+- Varsayilan olarak `REQUIRE_AUTH=true` guvenli moddur.
+- Bu modda `BACKEND_AUTH_TOKEN` zorunludur.
+- `/v1/*` endpointleri `Authorization: Bearer <BACKEND_AUTH_TOKEN>` veya `X-Backend-Token: <BACKEND_AUTH_TOKEN>` ister.
 - Eksik/gecersiz token: `401 {"error":"unauthorized"}`.
 
 Curl ornegi (production stili):
@@ -74,4 +75,6 @@ curl -s -X POST "http://127.0.0.1:3000/v1/dream/interpret" \
 
 ## Notlar
 
-- Uretim ortaminda OpenAI anahtari yalnizca server tarafinda tutulmali.
+- Uretim ortaminda OpenAI/Gemini anahtarlari yalnizca server tarafinda tutulmali.
+- `Info.plist` icine gercek token koymayin.
+- Sadece dahili gecici testler icin `SWIFT_ACTIVE_COMPILATION_CONDITIONS` icine `ALLOW_PLIST_TEST_TOKEN` eklenirse `BACKEND_AUTH_TOKEN` `Info.plist`'ten okunabilir.

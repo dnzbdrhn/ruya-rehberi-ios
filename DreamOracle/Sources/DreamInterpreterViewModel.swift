@@ -10,25 +10,6 @@ final class DreamInterpreterViewModel: ObservableObject {
         static let recordsKey = "dream_records_v2"
     }
 
-    private enum SecretsProvider {
-        static func resolveGeminiDebugEnvironment(
-            validator: (String) -> Bool
-        ) -> String {
-#if DEBUG
-            let value = normalized(ProcessInfo.processInfo.environment["GEMINI_API_KEY"] ?? "")
-            return validator(value) ? value : ""
-#else
-            return ""
-#endif
-        }
-
-        private static func normalized(_ rawValue: String) -> String {
-            rawValue
-                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-        }
-    }
-
     @Published var dreamText = ""
     @Published var transcriptText = ""
     @Published var interpretation = ""
@@ -49,9 +30,7 @@ final class DreamInterpreterViewModel: ObservableObject {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         service = OpenAIService()
-
-        let geminiKey = Self.resolvedGeminiAPIKey()
-        imageService = geminiKey.isEmpty ? nil : GeminiImageService(apiKey: geminiKey)
+        imageService = GeminiImageService()
 
         loadPersistedState()
         if selectedRecordID == nil {
@@ -88,7 +67,7 @@ final class DreamInterpreterViewModel: ObservableObject {
             detailText: input,
             symbols: fallbackSymbols(from: input),
             clarity: 0.5,
-            mood: "Nötr",
+            mood: defaultDreamMoodLabel(),
             source: .typed
         )
     }
@@ -96,11 +75,11 @@ final class DreamInterpreterViewModel: ObservableObject {
     func rebuildDreamFromFragments(_ fragments: String, mood: String) async -> String? {
         let trimmed = fragments.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            errorMessage = "Anahtar kelimeleri veya hatirladigin parcalari yaz."
+            errorMessage = localized("vm.error.fragments_empty")
             return nil
         }
         guard let service else {
-            errorMessage = "OpenAI baglantisi kurulamadigi icin ruya yeniden olusturulamadi."
+            errorMessage = localized("vm.error.rebuild_unavailable")
             return nil
         }
 
@@ -113,10 +92,10 @@ final class DreamInterpreterViewModel: ObservableObject {
             let rebuilt = try await service.rebuildDreamFromFragments(fragments: trimmed, mood: mood)
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !rebuilt.isEmpty else {
-                errorMessage = "Ruyayi yeniden olustururken bos sonuc dondu."
+                errorMessage = localized("vm.error.rebuild_empty_response")
                 return nil
             }
-            infoMessage = "Ruya taslagi olusturuldu. Dilersen duzenleyip kaydedebilirsin."
+            infoMessage = localized("vm.info.rebuild_ready")
             return rebuilt
         } catch {
             errorMessage = Self.userFriendly(error: error)
@@ -136,17 +115,17 @@ final class DreamInterpreterViewModel: ObservableObject {
     ) async {
         let trimmedText = detailText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
-            errorMessage = "Ruya anlatimi bos olamaz."
+            errorMessage = localized("vm.error.dream_text_empty")
             return
         }
         guard let service else {
-            errorMessage = "OpenAI baglantisi kurulamadigi icin yorum yapilamadi."
+            errorMessage = localized("vm.error.interpret_unavailable")
             return
         }
 
         let charge = nextInterpretationCharge()
         guard canAfford(charge: charge) else {
-            errorMessage = "2 ucretsiz hak bitti. Devam etmek icin kredi satin alin."
+            errorMessage = localized("vm.error.free_limit_reached")
             return
         }
 
@@ -201,7 +180,7 @@ final class DreamInterpreterViewModel: ObservableObject {
                     previewImageBase64 = imageData.base64EncodedString()
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-                    imageWarning = "Gorsel uretilemedi: \(message)"
+                    imageWarning = localized("vm.error.image_generation_failed_format", message)
                 }
             }
 
@@ -254,7 +233,7 @@ final class DreamInterpreterViewModel: ObservableObject {
         guard amount > 0 else { return }
         credits += amount
         persistState()
-        infoMessage = "\(amount) kredi yuklendi. Toplam kredi: \(credits)"
+        infoMessage = localized("vm.info.credits_added_format", amount, credits)
     }
 
     func record(for id: UUID) -> DreamRecord? {
@@ -278,7 +257,7 @@ final class DreamInterpreterViewModel: ObservableObject {
     ) -> UUID? {
         let trimmedText = detailText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
-            errorMessage = "Ruya anlatimi bos olamaz."
+            errorMessage = localized("vm.error.dream_text_empty")
             return nil
         }
 
@@ -317,15 +296,15 @@ final class DreamInterpreterViewModel: ObservableObject {
         let trimmedQuestion = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuestion.isEmpty else { return }
         guard credits >= Constants.followUpCreditCost else {
-            errorMessage = "Soru sormak icin 1 kredi gerekli."
+            errorMessage = localized("vm.error.followup_credit_required")
             return
         }
         guard let service else {
-            errorMessage = "OpenAI baglantisi kurulamadigi icin soru yanitlanamadi."
+            errorMessage = localized("vm.error.followup_unavailable")
             return
         }
         guard let recordSnapshot = record(for: recordID) else {
-            errorMessage = "Ruya kaydi bulunamadi."
+            errorMessage = localized("vm.error.record_missing")
             return
         }
 
@@ -347,7 +326,7 @@ final class DreamInterpreterViewModel: ObservableObject {
             dreamRecords[index].followUps.append(followUp)
             credits -= Constants.followUpCreditCost
             persistState()
-            infoMessage = "1 kredi dusuldu. Kalan kredi: \(credits)"
+            infoMessage = localized("vm.info.credit_spent_remaining_format", credits)
         } catch {
             errorMessage = Self.userFriendly(error: error)
         }
@@ -359,7 +338,7 @@ final class DreamInterpreterViewModel: ObservableObject {
 
         let granted = await recorder.requestPermission()
         guard granted else {
-            errorMessage = "Mikrofon izni verilmedi."
+            errorMessage = localized("vm.error.microphone_permission_denied")
             return
         }
 
@@ -375,11 +354,11 @@ final class DreamInterpreterViewModel: ObservableObject {
         isRecording = false
 
         guard let recordedURL = recorder.stopRecording() else {
-            errorMessage = "Kaydedilen ses dosyasi bulunamadi."
+            errorMessage = localized("vm.error.recorded_audio_missing")
             return nil
         }
         guard let service else {
-            errorMessage = "OpenAI baglantisi kurulamadigi icin ses islenemedi."
+            errorMessage = localized("vm.error.transcription_unavailable")
             return nil
         }
 
@@ -391,7 +370,7 @@ final class DreamInterpreterViewModel: ObservableObject {
             let transcript = try await service.transcribeAudio(fileURL: recordedURL)
             transcriptText = transcript
             dreamText = transcript
-            infoMessage = "Ses metne donusturuldu."
+            infoMessage = localized("vm.info.transcription_ready")
             return transcript
         } catch {
             errorMessage = Self.userFriendly(error: error)
@@ -409,7 +388,7 @@ final class DreamInterpreterViewModel: ObservableObject {
             detailText: transcript,
             symbols: fallbackSymbols(from: transcript),
             clarity: 0.5,
-            mood: "Nötr",
+            mood: defaultDreamMoodLabel(),
             source: .voice
         )
     }
@@ -478,10 +457,10 @@ final class DreamInterpreterViewModel: ObservableObject {
         switch charge {
         case .free:
             freeInterpretationsUsed += 1
-            infoMessage = "Ucretsiz hak kullanildi. Kalan: \(freeRemaining)"
+            infoMessage = localized("vm.info.free_used_remaining_format", freeRemaining)
         case .credit(let amount):
             credits -= amount
-            infoMessage = "\(amount) kredi dusuldu. Kalan kredi: \(credits)"
+            infoMessage = localized("vm.info.credits_spent_format", amount, credits)
         }
     }
 
@@ -519,23 +498,13 @@ final class DreamInterpreterViewModel: ObservableObject {
         }
     }
 
-    private static func resolvedGeminiAPIKey() -> String {
-        SecretsProvider.resolveGeminiDebugEnvironment(
-            validator: isValidGeminiAPIKey
-        )
-    }
-
-    private static func isValidGeminiAPIKey(_ value: String) -> Bool {
-        !value.isEmpty && !value.contains("$(")
-    }
-
     private func autoTitle(from text: String) -> String {
         let words = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .split(separator: " ")
             .prefix(4)
             .map(String.init)
-        if words.isEmpty { return "Gece Yankisi" }
+        if words.isEmpty { return dreamAutoFallbackTitle() }
         return words.joined(separator: " ")
     }
 
@@ -546,7 +515,7 @@ final class DreamInterpreterViewModel: ObservableObject {
         dreamText: String
     ) -> String {
         let manual = manualTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !manual.isEmpty, manual.lowercased() != "adsiz ruya" {
+        if !manual.isEmpty, !isUntitledTitle(manual) {
             return manual
         }
 
@@ -554,7 +523,7 @@ final class DreamInterpreterViewModel: ObservableObject {
             let cleanGenerated = generatedTitle
                 .replacingOccurrences(of: "\"", with: "")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            if !cleanGenerated.isEmpty, cleanGenerated.lowercased() != "adsiz ruya" {
+            if !cleanGenerated.isEmpty, !isUntitledTitle(cleanGenerated) {
                 return cleanGenerated
             }
         }
@@ -564,8 +533,8 @@ final class DreamInterpreterViewModel: ObservableObject {
         }
 
         let fallback = autoTitle(from: dreamText)
-        if fallback.lowercased() == "adsiz ruya" {
-            return "Gece Yankisi"
+        if isUntitledTitle(fallback) {
+            return dreamAutoFallbackTitle()
         }
         return fallback
     }
@@ -606,7 +575,7 @@ final class DreamInterpreterViewModel: ObservableObject {
     private func condensedPreview(from interpretation: String) -> String {
         let trimmed = interpretation.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            return "Özgürlük arayışı ve potansiyel. Semboller, içsel dönüşüm ve cesaret teması taşıyor."
+            return localized("vm.preview.default")
         }
 
         let lines = trimmed
@@ -624,6 +593,37 @@ final class DreamInterpreterViewModel: ObservableObject {
         if let localized = error as? LocalizedError, let text = localized.errorDescription {
             return text
         }
-        return "Beklenmeyen bir hata olustu: \(error.localizedDescription)"
+        return localized("vm.error.unexpected_format", error.localizedDescription)
+    }
+
+    private func isUntitledTitle(_ value: String) -> Bool {
+        let normalized = value
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .autoupdatingCurrent)
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if normalized.isEmpty { return true }
+
+        let localizedUntitled = localized("dream.title.untitled")
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .autoupdatingCurrent)
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return normalized == localizedUntitled || normalized == "adsiz ruya" || normalized == "untitled dream"
+    }
+
+    private func localized(_ key: String) -> String {
+        String(localized: String.LocalizationValue(key))
+    }
+
+    private func localized(_ key: String, _ arguments: CVarArg...) -> String {
+        String(format: localized(key), locale: .autoupdatingCurrent, arguments: arguments)
+    }
+
+    private static func localized(_ key: String) -> String {
+        String(localized: String.LocalizationValue(key))
+    }
+
+    private static func localized(_ key: String, _ arguments: CVarArg...) -> String {
+        String(format: localized(key), locale: .autoupdatingCurrent, arguments: arguments)
     }
 }

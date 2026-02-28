@@ -5,6 +5,7 @@ struct DreamProfileView: View {
     @Environment(\.usesSharedTabPanoramaBackground) private var usesSharedTabPanoramaBackground
     #if DEBUG
     @State private var showDebugEvents = false
+    @State private var showDesignSystemPreview = false
     #endif
 
     var body: some View {
@@ -30,6 +31,11 @@ struct DreamProfileView: View {
         .sheet(isPresented: $showDebugEvents) {
             DebugEventsView()
         }
+        .sheet(isPresented: $showDesignSystemPreview) {
+            NavigationStack {
+                DesignSystemPreviewView()
+            }
+        }
         #endif
     }
 
@@ -47,6 +53,11 @@ struct DreamProfileView: View {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 34))
                 .foregroundStyle(Color.white.opacity(0.9))
+                #if DEBUG
+                .onLongPressGesture(minimumDuration: 1.2) {
+                    showDesignSystemPreview = true
+                }
+                #endif
         }
     }
 

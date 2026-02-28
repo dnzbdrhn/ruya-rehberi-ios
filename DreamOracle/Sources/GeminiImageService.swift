@@ -3,21 +3,29 @@ import UIKit
 
 struct GeminiImageService {
     private let session: URLSession
-    private let apiKey: String
+    private let baseURL: URL
+    private let optionalAuthToken: String?
 
-    init(apiKey: String, session: URLSession = .shared) {
-        self.apiKey = apiKey
+    init(
+        session: URLSession = .shared,
+        baseURL: URL = BackendImageConfiguration.resolveBaseURL(),
+        optionalAuthToken: String? = BackendImageConfiguration.resolveOptionalAuthToken()
+    ) {
         self.session = session
+        self.baseURL = baseURL
+        self.optionalAuthToken = optionalAuthToken
+    }
+
+    // Compatibility initializer: API key is ignored because image generation now goes through backend proxy.
+    init(apiKey _: String, session: URLSession = .shared) {
+        self.init(session: session)
     }
 
     func generateDreamArtwork(title: String, keywords: [String], mood: String, dreamText: String) async throws -> Data {
-        let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent"
-        var request = URLRequest(url: URL(string: endpoint)!)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "x-goog-api-key")
+        try BackendImageConfiguration.validateRuntimeBaseURL(baseURL)
+        var request = makeJSONRequest(path: "v1/dream/image")
 
-        let keywordLine = keywords.isEmpty ? "Rüya sembolleri" : keywords.joined(separator: ", ")
+        let keywordLine = keywords.isEmpty ? String(localized: "image.keywords.fallback") : keywords.joined(separator: ", ")
         let visualMood = softenedVisualMood(from: mood)
         let prompt = """
         Create a symbolic and poetic dream artwork with a gentle, cinematic tone.
@@ -38,40 +46,59 @@ struct GeminiImageService {
         Return a full-bleed single artwork only.
         """
 
-        let body = GeminiGenerateRequest(
-            contents: [.init(parts: [.init(text: prompt)])],
-            generationConfig: .init(responseModalities: ["IMAGE"])
+        let body = BackendImageGenerateRequest(
+            prompt: prompt,
+            size: "1024x1024",
+            seed: nil,
+            style: nil
         )
         request.httpBody = try JSONEncoder().encode(body)
 
         let (data, response) = try await session.data(for: request)
         try validate(response: response, data: data)
 
-        let decoded = try JSONDecoder().decode(GeminiGenerateResponse.self, from: data)
-
-        if let firstInline = decoded.candidates?
-            .flatMap({ $0.content?.parts ?? [] })
-            .compactMap({ $0.inlineData?.data })
-            .first
-        {
-            let cleaned = firstInline.replacingOccurrences(of: "\n", with: "")
-            if let imageData = Data(base64Encoded: cleaned) {
-                return Self.normalizeGeneratedImageData(imageData)
-            }
+        let decoded = try JSONDecoder().decode(BackendImageGenerateResponse.self, from: data)
+        let cleaned = (decoded.imageBase64 ?? "").replacingOccurrences(of: "\n", with: "")
+        if let imageData = Data(base64Encoded: cleaned) {
+            return Self.normalizeGeneratedImageData(imageData)
         }
 
-        throw GeminiImageServiceError.invalidResponse("Gorsel verisi alinmadi.")
+        throw GeminiImageServiceError.invalidResponse(String(localized: "error.image.data_missing"))
+    }
+
+    private func makeJSONRequest(path: String) -> URLRequest {
+        let normalizedPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
+        let url = baseURL.appendingPathComponent(normalizedPath)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+#if DEBUG || ALLOW_PLIST_TEST_TOKEN
+        if let token = optionalAuthToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+#endif
+        return request
     }
 
     private func validate(response: URLResponse, data: Data) throws {
         guard let http = response as? HTTPURLResponse else {
-            throw GeminiImageServiceError.invalidResponse("HTTP yaniti alinamadi.")
+            throw GeminiImageServiceError.invalidResponse(String(localized: "error.http.response_missing"))
         }
         guard (200...299).contains(http.statusCode) else {
-            if let envelope = try? JSONDecoder().decode(GeminiErrorEnvelope.self, from: data) {
+            if let envelope = try? JSONDecoder().decode(BackendMessageErrorEnvelope.self, from: data) {
                 throw GeminiImageServiceError.apiError(envelope.error.message)
             }
-            throw GeminiImageServiceError.apiError("Gemini HTTP \(http.statusCode) hatasi")
+            if let envelope = try? JSONDecoder().decode(BackendStringErrorEnvelope.self, from: data) {
+                throw GeminiImageServiceError.apiError(envelope.error)
+            }
+            throw GeminiImageServiceError.apiError(
+                String(
+                    format: String(localized: "error.http.status_format"),
+                    locale: .autoupdatingCurrent,
+                    http.statusCode
+                )
+            )
         }
     }
 
@@ -268,72 +295,107 @@ struct GeminiImageService {
     }
 }
 
-private struct GeminiGenerateRequest: Encodable {
-    let contents: [GeminiContent]
-    let generationConfig: GeminiGenerationConfig
+private enum BackendImageConfiguration {
+    private static let fallbackBaseURL = URL(string: "https://backend.example.com")!
+    private static let placeholderHost = "backend.example.com"
 
-    enum CodingKeys: String, CodingKey {
-        case contents
-        case generationConfig = "generationConfig"
+    static func resolveBaseURL() -> URL {
+        let raw = ((Bundle.main.object(forInfoDictionaryKey: "BACKEND_BASE_URL") as? String) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if
+            let url = URL(string: raw),
+            let scheme = url.scheme?.lowercased(),
+            ["http", "https"].contains(scheme),
+            !raw.isEmpty
+        {
+            return url
+        }
+        return fallbackBaseURL
+    }
+
+    static func validateRuntimeBaseURL(_ baseURL: URL) throws {
+#if DEBUG
+        _ = baseURL
+#else
+        let host = (baseURL.host ?? "").lowercased()
+        if host.isEmpty || host == placeholderHost {
+            throw GeminiImageServiceError.backendBaseURLMissing
+        }
+#endif
+    }
+
+    static func resolveOptionalAuthToken() -> String? {
+#if DEBUG
+        if let envToken = normalizedToken(ProcessInfo.processInfo.environment["BACKEND_AUTH_TOKEN"] ?? "") {
+            return envToken
+        }
+#else
+#if !ALLOW_PLIST_TEST_TOKEN
+        return nil
+#endif
+#endif
+
+#if ALLOW_PLIST_TEST_TOKEN
+        return normalizedToken((Bundle.main.object(forInfoDictionaryKey: "BACKEND_AUTH_TOKEN") as? String) ?? "")
+#else
+        return nil
+#endif
+    }
+
+    private static func normalizedToken(_ rawToken: String) -> String? {
+        let value = rawToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        return value.isEmpty ? nil : value
     }
 }
 
-private struct GeminiContent: Encodable {
-    let parts: [GeminiPart]
+private struct BackendImageGenerateRequest: Encodable {
+    let prompt: String
+    let size: String?
+    let seed: Int?
+    let style: String?
 }
 
-private struct GeminiPart: Encodable {
-    let text: String
-}
-
-private struct GeminiGenerationConfig: Encodable {
-    let responseModalities: [String]
+private struct BackendImageGenerateResponse: Decodable {
+    let imageBase64: String?
 
     enum CodingKeys: String, CodingKey {
-        case responseModalities = "responseModalities"
+        case imageBase64 = "image_base64"
     }
 }
 
-private struct GeminiGenerateResponse: Decodable {
-    let candidates: [GeminiCandidate]?
+private struct BackendMessageErrorEnvelope: Decodable {
+    let error: BackendMessageError
 }
 
-private struct GeminiCandidate: Decodable {
-    let content: GeminiContentResponse?
-}
-
-private struct GeminiContentResponse: Decodable {
-    let parts: [GeminiPartResponse]?
-}
-
-private struct GeminiPartResponse: Decodable {
-    let text: String?
-    let inlineData: GeminiInlineData?
-}
-
-private struct GeminiInlineData: Decodable {
-    let mimeType: String?
-    let data: String?
-}
-
-private struct GeminiErrorEnvelope: Decodable {
-    let error: GeminiError
-}
-
-private struct GeminiError: Decodable {
+private struct BackendMessageError: Decodable {
     let message: String
+}
+
+private struct BackendStringErrorEnvelope: Decodable {
+    let error: String
 }
 
 enum GeminiImageServiceError: LocalizedError {
     case apiError(String)
     case invalidResponse(String)
+    case backendBaseURLMissing
 
     var errorDescription: String? {
         switch self {
         case .apiError(let message):
-            return "Gemini hatasi: \(message)"
+            return String(
+                format: String(localized: "error.gemini.api_format"),
+                locale: .autoupdatingCurrent,
+                message
+            )
         case .invalidResponse(let message):
-            return "Gecersiz Gemini cevabi: \(message)"
+            return String(
+                format: String(localized: "error.gemini.invalid_response_format"),
+                locale: .autoupdatingCurrent,
+                message
+            )
+        case .backendBaseURLMissing:
+            return String(localized: "error.backend.base_url_missing")
         }
     }
 }
